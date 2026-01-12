@@ -3,9 +3,8 @@ from flask import Flask, render_template
 from flask_migrate import Migrate
 from livereload import Server
 from database import db
-from models.model import seedData
 from dotenv import load_dotenv
-from models.model import seedData
+from seed import seedData
 
 load_dotenv()
 
