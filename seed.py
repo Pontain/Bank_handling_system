@@ -9,7 +9,7 @@ def seedData(db):
     antal = db.session.query(Customer).count()
     countries = ["SV", "DK", "NO", "FI"]
 
-    while antal < 5000:
+    while antal < 1000:
         customer = Customer()
         country = random.choice(countries)
         locale = locales[country]

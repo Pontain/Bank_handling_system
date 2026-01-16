@@ -26,9 +26,17 @@ class Statistics:
             .limit(10)
             .all()
         )
+    
+    def total_balance_all_accounts(self):
+        return (
+            self.session.query(func.coalesce(func.sum(Transaction.Amount), 0))
+            .scalar()
+            or 0
+        )
 
     def dashboard(self) -> dict: # Packar ner allt i en låda typ. De tre funktionerna körs och läggs i en dict. Detta kan sen köras via rout till en template.
         return {"customer_count": self.customer_count(),
                 "account_count": self.account_count(),
-                "totals_per_account": self.total_per_account()
+                "totals_per_account": self.total_per_account(),
+                "total_balance_all_accounts": self.total_balance_all_accounts()
                 }

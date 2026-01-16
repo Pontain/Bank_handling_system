@@ -38,6 +38,13 @@
         </div>
 
         <!-- Tabell för salto per konto -->
+        
+        <div class="stats-card">
+            <small>Total balance (all accounts)</small>
+            <div class="stats-number">
+                {{ "%.2f"|format(total_balance_all_accounts) }} kr
+            </div>
+        </div>
 
         <h3 class="text-secondary">Top 10 Account Balances</h3>
 
@@ -63,6 +70,7 @@
         {% else %}
             <p class="text-secondary">No account balances available.</p> <!-- Visas om listan är tom, sk. fallback-text. -->
         {% endif %}
-    </div>
+
+        
 </section>
 {% endblock %}

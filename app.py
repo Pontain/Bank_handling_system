@@ -6,14 +6,25 @@ from database import db
 from dotenv import load_dotenv
 from seed import seedData
 from services.statistics import Statistics
+from Routes.customer_routes import customer_bp
 
 load_dotenv()
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL")
+app.config.update(
+    MAIL_SERVER="smtp.gmail.com",
+    MAIL_PORT=587,
+    MAIL_USE_TLS=True,
+    MAIL_USE_SSL=False,
+    MAIL_USERNAME=os.getenv("MAIL_USERNAME"),
+    MAIL_PASSWORD=os.getenv("MAIL_PASSWORD"),
+    MAIL_DEFAULT_SENDER=os.getenv("MAIL_DEFAULT_SENDER"),
+)
 environment = os.getenv("FLASK_DEBUG") # Kolla upp!
 db.init_app(app)
 migrate = Migrate(app, db)
+app.register_blueprint(customer_bp)
 
 
 @app.route("/")
