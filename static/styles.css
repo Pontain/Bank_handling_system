@@ -340,3 +340,13 @@ footer p{
     grid-template-columns: repeat(2, 1fr);
   }
 }
+.stats-table th span i {
+  font-size: 18px;
+  line-height: 1;
+  vertical-align: middle;
+  margin-left: 4px;
+  color: black;
+}
+.stats-table th a {
+  text-decoration: none;
+}

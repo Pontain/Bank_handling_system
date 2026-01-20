@@ -1,1 +1,39 @@
-<p>customer with id</p>
+{% extends "user/layout.html" %}
+
+{% from "components/macros.html" import render_pagination, render_sorting_header %}
+
+{% block title %}Customer{% endblock %}
+
+{% block content %}
+
+<h2>Accounts</h2>
+
+{% if customer.Accounts %}
+  <table class="stats-table">
+    <thead>
+      <tr>
+        <th>Account ID</th>
+        <th>Type</th>
+        <th>Created</th>
+        <th class="right">Balance</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for acc in customer.Accounts %}
+        <tr>
+          <td>
+            <a href="{{ url_for('account.get_one', account_id=acc.Id) }}">
+              {{ acc.Id }}
+            </a>
+          </td>
+          <td>{{ acc.AccountType.value if acc.AccountType else acc.AccountType }}</td>
+          <td>{{ acc.Created }}</td>
+          <td class="right">{{ acc.Balance }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% else %}
+  <p>No accounts for this customer.</p>
+{% endif %}
+{% endblock %}

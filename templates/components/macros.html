@@ -1,0 +1,52 @@
+
+{% macro render_pagination(pagination, endpoint) %}
+    <div class="page-items text-primary">
+    {{ pagination.first }} - {{ pagination.last }} of {{ pagination.total }}
+  </div>
+  <div class="pagination text-primary">
+    {% for page in pagination.iter_pages() %}
+      {% if page %}
+        {% if page != pagination.page %}
+          <a href="{{ url_for(
+    endpoint,
+    page=page,
+    per_page=50,
+    sort_by=request.args.get('sort_by'),
+    sort_order=request.args.get('sort_order'),
+    q=request.args.get('q'),
+    city=request.args.get('city')
+) }}">{{ page }}</a>
+
+        {% else %}
+          <strong>{{ page }}</strong>
+        {% endif %}
+      {% else %}
+        <span class=ellipsis>…</span>
+      {% endif %}
+    {% endfor %}
+  </div>
+{% endmacro %}
+
+{% macro render_sorting_header(column_name, sort_by, endpoint, page, per_page) %}
+<span>
+    {{column_name}} 
+    <a href="{{ url_for(endpoint,
+    page=page,
+    per_page=50,
+    sort_order='asc',
+    sort_by=sort_by,
+    q=request.args.get('q'),
+    city=request.args.get('city')
+) }}"><i class='bx bx-chevron-up'></i></a>
+
+<a href="{{ url_for(endpoint,
+    page=page,
+    per_page=50,
+    sort_order='desc',
+    sort_by=sort_by,
+    q=request.args.get('q'),
+    city=request.args.get('city')
+) }}"><i class='bx bx-chevron-down'></i></a>
+
+</span>
+{% endmacro %}

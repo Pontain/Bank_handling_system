@@ -1,0 +1,88 @@
+{# templates/user/customer/customers.html #}
+{% extends "user/layout.html" %}
+
+{% from "components/macros.html" import render_pagination, render_sorting_header %}
+
+{% block title %}Customers{% endblock %}
+
+{% block content %}
+
+<div class="container">
+
+  <h1 class="text-primary">Customers</h1>
+  <p class="text-secondary">Search results / customer list</p>
+
+  {# Om du vill ha sökform här senare kan du lägga den ovanför tabellen #}
+
+  <form method="get" action="{{ url_for('customer.get_all') }}" class="search-form">
+  <input type="text" name="q" placeholder="Sök namn..." value="{{ q|default('') }}">
+  <input type="text" name="city" placeholder="Stad..." value="{{ city|default('') }}">
+
+  {# behåll sort vid ny sökning #}
+  <input type="hidden" name="sort_by" value="{{ sort_by }}">
+  <input type="hidden" name="sort_order" value="{{ sort_order }}">
+  <input type="hidden" name="per_page" value="{{ per_page }}">
+
+  <button class="btn btn-primary" type="submit">Search</button>
+
+  <a class="btn" href="{{ url_for('customer.get_all') }}">Rensa</a>
+</form>
+
+
+  {% if customers and customers|length > 0 %}
+
+    <div class="table-wrap">
+      <table class="stats-table">
+        <thead>
+          <tr>
+            <th>
+              {{ render_sorting_header("Id", "Id", "customer.get_all", page, per_page) }}
+            </th>
+            <th>
+              {{ render_sorting_header("NationalId", "NationalId", "customer.get_all", page, per_page) }}
+            </th>
+            <th>
+              {{ render_sorting_header("Surname", "Surname", "customer.get_all", page, per_page) }}
+            </th>
+            <th>
+              {{ render_sorting_header("GivenName", "GivenName", "customer.get_all", page, per_page) }}
+            </th>
+            <th>
+              {{ render_sorting_header("Streetaddress", "Streetaddress", "customer.get_all", page, per_page) }}
+            </th>
+            <th>
+              {{ render_sorting_header("City", "City", "customer.get_all", page, per_page) }}
+            </th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {% for c in customers %}
+            <tr>
+              <td>
+                <a href="{{ url_for('customer.get_one', id=c.Id) }}">
+                  {{ c.CustomerNumber }}
+                </a>
+              </td>
+              <td>{{ c.NationalId }}</td>
+              <td>{{ c.Surname }}</td>
+              <td>{{ c.GivenName }}</td>
+              <td>{{ c.StreetAddress }}</td>
+              <td>{{ c.City }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="mt-3">
+      {{ render_pagination(pagination, "customer.get_all") }}
+    </div>
+
+  {% else %}
+    <p class="text-secondary">No customers found.</p>
+  {% endif %}
+
+</div>
+
+{% endblock %}
