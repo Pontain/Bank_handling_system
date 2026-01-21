@@ -1,8 +1,10 @@
+/* =========================================================
+   RESET (Meyer)
+   ========================================================= */
 /* http://meyerweb.com/eric/tools/css/reset/ 
    v2.0 | 20110126
    License: none (public domain)
 */
-
 @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
 
@@ -19,57 +21,39 @@ article, aside, canvas, details, embed,
 figure, figcaption, footer, header, hgroup, 
 menu, nav, output, ruby, section, summary,
 time, mark, audio, video {
-	margin: 0;
-	padding: 0;
-	border: 0;
-	font-size: 100%;
-	font: inherit;
-	vertical-align: baseline;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline;
 }
-/* HTML5 display-role reset for older browsers */
 article, aside, details, figcaption, figure, 
 footer, header, hgroup, menu, nav, section {
-	display: block;
+  display: block;
 }
-body {
-	line-height: 1;
-}
-ol, ul {
-	list-style: none;
-}
-blockquote, q {
-	quotes: none;
-}
+ol, ul { list-style: none; }
+blockquote, q { quotes: none; }
 blockquote:before, blockquote:after,
-q:before, q:after {
-	content: '';
-	content: none;
-}
-table {
-	border-collapse: collapse;
-	border-spacing: 0;
-}
-html {
-  box-sizing: border-box;
-}
-*, *:before, *:after {
-  box-sizing: inherit;
-}
+q:before, q:after { content: ''; content: none; }
+table { border-collapse: collapse; border-spacing: 0; }
 
-button, input {
-  font-family: inherit;
-}
+html { box-sizing: border-box; }
+*, *:before, *:after { box-sizing: inherit; }
+button, input { font-family: inherit; }
 
+/* =========================================================
+   THEME VARIABLES
+   ========================================================= */
 :root {
   /* Text sizes */
-  /* 1 rem = 16px since it is relative to the html base, which is 16px by default */
-  --text-size-xs: 0.75rem; /* 12px */
-  --text-size-sm: 0.875rem; /* 14px */
-  --text-size-md: 1rem; /* 16px */
-  --text-size-lg: 1.5rem; /* 24px */
-  --text-size-xl: 2rem; /* 32px */
-  --text-size-3xl: 3rem; /* 48px */
-  --text-size-4xl: 4.5rem; /* 72px */
+  --text-size-xs: 0.75rem;
+  --text-size-sm: 0.875rem;
+  --text-size-md: 1rem;
+  --text-size-lg: 1.5rem;
+  --text-size-xl: 2rem;
+  --text-size-3xl: 3rem;
+  --text-size-4xl: 4.5rem;
 
   --padding-sm: 0.25rem;
   --padding-md: 0.5rem;
@@ -105,11 +89,18 @@ button, input {
   --color-bg-section: #E5E7EB;
   --color-bg-alt: #ffffff;
 
+  /* Frosted glass */
+  --glass-bg: rgba(255, 255, 255, 0.75);
+  --glass-bg-strong: rgba(255, 255, 255, 0.95);
+  --glass-border: rgba(255, 255, 255, 0.35);
+  --glass-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  --glass-blur: 3px;
 }
 
-html{
-	font-family: 'Poppins', Arial, sans-serif;
-}
+/* =========================================================
+   BASE
+   ========================================================= */
+html { font-family: 'Poppins', Arial, sans-serif; }
 
 body {
   font-size: var(--text-size-md);
@@ -117,29 +108,18 @@ body {
   color: var(--text-color-dark);
   line-height: 1.6;
   background-color: var(--color-bg-primary);
+
+  /* Background image */
+  background-image: url("/static/assets/images/gold.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
 }
 
-.container {
-  max-width: 95%;
-  padding: 0 1rem;
-  margin: 0 auto;
-}
-
-
-h1 {
-  font-size: var(--text-size-3xl);
-  font-weight: var(--font-weight-bold);
-}
-
-h2 {
-  font-size: var(--text-size-lg);
-  font-weight: var(--font-weight-bold);
-}
-
-h3 {
-  font-size: var(--text-size-lg);
-  font-weight: var(--font-weight-medium);
-}
+h1 { font-size: var(--text-size-3xl); font-weight: var(--font-weight-bold); }
+h2 { font-size: var(--text-size-lg); font-weight: var(--font-weight-bold); }
+h3 { font-size: var(--text-size-lg); font-weight: var(--font-weight-medium); }
 
 p {
   font-size: var(--text-size-md);
@@ -148,28 +128,53 @@ p {
   margin-bottom: 1rem;
 }
 
-a {
-  color: var(--text-color-light);
+a { color: var(--text-color-light); }
+small { font-size: var(--text-size-sm); color: var(--text-muted-light); }
+
+/* Helpers */
+.text-blue { color: var(--color-btn-primary-hover); }
+.text-primary { color: var(--text-color-light); }
+.text-secondary { color: var(--text-color-dark); }
+.text-muted { color: var(--text-muted-light); }
+.right { text-align: right; }
+
+/* =========================================================
+   LAYOUT
+   ========================================================= */
+.container {
+  max-width: 95%;
+  padding: 0 1rem;
+  margin: 0 auto;
 }
 
-small {
-  font-size: var(--text-size-sm);
-  color: var(--text-muted-light);
+/* main padding, så innehåll inte klistrar mot navbar */
+main {
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+  height: auto;
+  min-height: 0;
 }
 
-.text-primary{
-  color: var(--text-color-light);
+/* Header/Nav */
+header nav {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+nav ul {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
-.text-secondary{
-  color: var(--text-color-dark);
-}
+/* Footer */
+footer { background-color: var(--color-bg-primary); }
+footer p { margin-bottom: 0; text-align: center; }
 
-.text-muted{
-  color: var(--text-muted-light);
-}
-
-.btn{
+/* =========================================================
+   BUTTONS
+   ========================================================= */
+.btn {
   font-size: var(--text-size-md);
   font-family: 'Roboto', Arial, sans-serif;
   padding: var(--padding-md) var(--padding-lg);
@@ -178,123 +183,79 @@ small {
   cursor: pointer;
   transition: background-color 0.2s, color 0.2s;
 }
+a.btn.btn-primary { text-decoration: none; }
 
-a.btn.btn-primary{
-  text-decoration: none;
-}
-
-.btn-primary{
+.btn-primary {
   background-color: var(--color-btn-primary);
   color: var(--color-btn-primary-text);
   border: 1px solid var(--color-btn-primary-border);
 }
+.btn-primary:hover { background-color: var(--color-btn-primary-hover); }
 
-.btn-primary:hover{
-  background-color: var(--color-btn-primary-hover);
-}
-
-.btn-secondary{
+.btn-secondary {
   background-color: var(--color-btn-secondary);
   color: var(--color-btn-secondary-text);
   border: 1px solid var(--color-btn-secondary-border);
 }
+.btn-secondary:hover { background-color: var(--color-btn-secondary-hover); }
 
-.btn-secondary:hover{
-  background-color: var(--color-btn-secondary-hover);
+/* =========================================================
+   HERO (Home)
+   ========================================================= */
+.home-hero {
+  /* du tog bort 100vh, så vi håller den “tight” */
+  min-height: 0;
+  padding: 2rem 0 1rem;
 }
 
-header nav{
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-}
-
-nav ul {
-  display: flex;
+/* Layout: text vänster, logo höger */
+.home-hero .hero-grid {
+  display: grid;
+  grid-template-columns: 1fr auto;
   align-items: center;
-  gap: 0.5rem;
+  gap: 2rem;
 }
 
-.hero{
-  min-height: 100vh;
-  height: auto;
+.home-hero .hero-text { text-align: left; }
+
+.home-hero .hero-logo { justify-self: end; }
+
+.home-hero .hero-logo img {
+  max-height: 180px; /* justera vid behov */
+  width: auto;
+  display: block;
+  border-radius: 8px; /* valfritt */
 }
 
-.info{
-  background-color: var(--color-bg-section);
+/* =========================================================
+   COMPONENTS: Cards + Tables + Stats
+   ========================================================= */
+
+/* “Glass” utility för dina vita boxar */
+.glass,
+.stats-card,
+.table-wrap,
+.customer-info,
+.hero > .container,
+main > .container {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
 }
 
-footer{
-  background-color: var(--color-bg-primary);
-}
-
-footer p{
-  margin-bottom: 0;
-  text-align: center;
-}
-
-@media (min-width: 576px) {
-  header nav{
-    justify-content: space-between;
-    align-items: center;
-    flex-direction: row;
-  }
-
-  nav ul{
-    flex-direction: row;
-    gap: 1rem;
-  }
-}
-
-@media (min-width: 768px) {
-  .container{
-    max-width: 90%;
-    margin: 0 auto;
-  }
-
-  h1{
-    font-size: var(--text-size-4xl);
-  }
-  h2{
-    font-size: var(--text-size-3xl);
-  }
-}
-
-@media (min-width: 992px) {
-  .container{
-    max-width: 960px;
-    margin: 0 auto;
-  }
-}
-
-@media (min-width: 1200px) {
-  .container{
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 1rem;
-  }
-}
-
-@media (min-width: 1400px) {
-  .container{
-    max-width: 1400px;
-  }
-}
-
+/* Stats */
 .stats-grid {
   display: grid;
   grid-template-columns: 1fr;
   gap: 1rem;
   margin: 1rem 0 2rem 0;
 }
-
 .stats-card {
-  background: var(--color-bg-alt);
   border-radius: var(--border-radius-m);
   padding: 1rem;
-  border: 1px solid #00000010;
 }
-
 .stats-number {
   font-size: var(--text-size-3xl);
   font-weight: var(--font-weight-bold);
@@ -303,14 +264,17 @@ footer p{
   margin-top: 0.25rem;
 }
 
+/* Table */
 .table-wrap {
   overflow-x: auto;
   margin-bottom: 1rem;
+  border-radius: var(--border-radius-m);
+  padding: 0; /* viktigt: låt tabellen sköta padding */
 }
 
 .stats-table {
   width: 100%;
-  background: var(--color-bg-alt);
+  background: transparent; /* så glassen från table-wrap syns */
   border-radius: var(--border-radius-m);
   overflow: hidden;
 }
@@ -323,23 +287,13 @@ footer p{
 }
 
 .stats-table thead th {
-  background: #00000008;
+  background: var(--glass-bg-strong);
   font-weight: var(--font-weight-medium);
 }
 
-.stats-table tr:last-child td {
-  border-bottom: none;
-}
+.stats-table tr:last-child td { border-bottom: none; }
 
-.right {
-  text-align: right;
-}
-
-@media (min-width: 768px) {
-  .stats-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
+/* Sorting icons */
 .stats-table th span i {
   font-size: 18px;
   line-height: 1;
@@ -347,6 +301,103 @@ footer p{
   margin-left: 4px;
   color: black;
 }
-.stats-table th a {
-  text-decoration: none;
+.stats-table th a { text-decoration: none; }
+
+/* Clickable rows */
+.clickable-row { cursor: pointer; }
+.clickable-row:hover { filter: brightness(0.98); }
+
+/* Total balance */
+.total-balance {
+  font-size: 1.2rem;
+  margin: 1rem 0 2rem 0;
+}
+
+/* =========================================================
+   PAGINATION
+   ========================================================= */
+.pagination { color: var(--text-color-dark); }
+
+.pagination a { color: #2563eb; }
+.pagination strong { color: var(--text-color-dark); }
+.pagination .ellipsis { color: var(--text-color-dark); }
+
+.pagination a:hover {
+  text-decoration: underline;
+  opacity: 0.85;
+}
+
+/* =========================================================
+   NAV LOGO
+   ========================================================= */
+.nav-logo {
+  height: 40px;     /* 32–48px brukar vara perfekt */
+  width: auto;
+  display: block;
+}
+
+/* =========================================================
+   TEXT COLOR INSIDE MAIN
+   (OBS: detta gör rubriker mörka på alla sidor i <main>)
+   Om du vill ha vitt på vissa sidor: gör en egen klass istället.
+   ========================================================= */
+main h1,
+main h2,
+main h3 {
+  color: var(--text-color-dark);
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+@media (min-width: 576px) {
+  header nav {
+    justify-content: space-between;
+    align-items: center;
+    flex-direction: row;
+  }
+
+  nav ul {
+    flex-direction: row;
+    gap: 1rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .container { max-width: 90%; margin: 0 auto; }
+
+  h1 { font-size: var(--text-size-4xl); }
+  h2 { font-size: var(--text-size-3xl); }
+
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (min-width: 992px) {
+  .container { max-width: 960px; margin: 0 auto; }
+}
+
+@media (min-width: 1200px) {
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+  }
+}
+
+@media (min-width: 1400px) {
+  .container { max-width: 1400px; }
+}
+
+@media (max-width: 768px) {
+  .home-hero .hero-grid {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+
+  .home-hero .hero-logo {
+    justify-self: center;
+    margin-top: 1rem;
+  }
+
+  .home-hero .hero-text { text-align: center; }
 }

@@ -3,15 +3,22 @@
 {% block title %}Home Page{% endblock %}
 
 {% block content %}
-<section class="hero text-primary">
-    <div class="container">
-        <h1>My Flask Web page</h1>
-        <h2>This will become a nice bank app.</h2>
-        <p>This is the content of the index page!</p>
-        <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Consectetur aut laboriosam quis, vero dicta natus culpa voluptas fuga dolorem, deserunt esse, dolore atque. Ipsa, similique. Commodi ut dolore illo rem.</p>
-        <button class="btn btn-primary">primary button</button>
-        <button class="btn btn-secondary">secondary button</button>
+<section class="home-hero text-primary">
+  <div class="container hero-grid">
+
+    <div class="hero-text">
+      <h1>The gold bank</h1>
+      <h2>The first gold farming bank.</h2>
     </div>
+
+    <div class="hero-logo">
+      <img
+        src="{{ url_for('static', filename='assets/images/logo.jpg') }}"
+        alt="Bank logo"
+      >
+    </div>
+
+  </div>
 </section>
 
 <!-- <section class="info"> är ett semantiskt HTML-element för ett eget innehållsblock

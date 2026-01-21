@@ -1,9 +1,9 @@
 
 {% macro render_pagination(pagination, endpoint) %}
-    <div class="page-items text-primary">
+    <div class="page-items text-blue">
     {{ pagination.first }} - {{ pagination.last }} of {{ pagination.total }}
   </div>
-  <div class="pagination text-primary">
+  <div class="pagination text-blue">
     {% for page in pagination.iter_pages() %}
       {% if page %}
         {% if page != pagination.page %}

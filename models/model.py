@@ -1,6 +1,7 @@
 from enum import Enum as PyEnum
 from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy import Integer, text
+from sqlalchemy import Integer, text, Numeric
+from decimal import Decimal
 from typing import Annotated
 from database import db
 
@@ -48,7 +49,7 @@ class Account(db.Model):
         nullable=False,
     )
     Created = mapped_column(db.DateTime, unique=False, nullable=False)
-    Balance = mapped_column(db.Integer, unique=False, nullable=False)
+    Balance = mapped_column(Numeric(18, 2), unique=False, nullable=False)
     Transactions = db.relationship("Transaction", backref="account", lazy=True)
     CustomerId = mapped_column(
         db.Integer, db.ForeignKey("customers.Id"), nullable=False
@@ -61,8 +62,8 @@ class Transaction(db.Model):
     Type = mapped_column(db.String(20), unique=False, nullable=False)
     Operation = mapped_column(db.String(50), unique=False, nullable=False)
     Date = mapped_column(db.DateTime, unique=False, nullable=False)
-    Amount = mapped_column(db.Integer, unique=False, nullable=False)
-    NewBalance = mapped_column(db.Integer, unique=False, nullable=False)
+    Amount = mapped_column(Numeric(18, 2), unique=False, nullable=False)
+    NewBalance = mapped_column(Numeric(18, 2), unique=False, nullable=False)
     AccountId = mapped_column(db.Integer, db.ForeignKey("accounts.Id"), nullable=False)
 
 

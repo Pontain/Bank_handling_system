@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 from seed import seedData
 from services.statistics import Statistics
 from Routes.customer_routes import customer_bp
+from Routes.account_routes import account_bp
 
 load_dotenv()
 
@@ -25,6 +26,7 @@ environment = os.getenv("FLASK_DEBUG") # Kolla upp!
 db.init_app(app)
 migrate = Migrate(app, db)
 app.register_blueprint(customer_bp)
+app.register_blueprint(account_bp)
 
 
 @app.route("/")

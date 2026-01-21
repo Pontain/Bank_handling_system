@@ -9,14 +9,19 @@
 
 <div class="container">
 
-  <h1 class="text-primary">Customers</h1>
+  <h1 class="text-secondary">Customers</h1>
   <p class="text-secondary">Search results / customer list</p>
+
+  <form method="get" action="{{ url_for('customer.by_id') }}" class="search-form">
+  <input type="number" name="id" placeholder="Customer id" min="1" required>
+  <button type="submit" class="btn btn-primary">Open</button>
+  </form>
 
   {# Om du vill ha sökform här senare kan du lägga den ovanför tabellen #}
 
   <form method="get" action="{{ url_for('customer.get_all') }}" class="search-form">
-  <input type="text" name="q" placeholder="Sök namn..." value="{{ q|default('') }}">
-  <input type="text" name="city" placeholder="Stad..." value="{{ city|default('') }}">
+  <input type="text" name="q" placeholder="Search name" value="{{ q|default('') }}">
+  <input type="text" name="city" placeholder="Search city" value="{{ city|default('') }}">
 
   {# behåll sort vid ny sökning #}
   <input type="hidden" name="sort_by" value="{{ sort_by }}">
@@ -39,7 +44,7 @@
               {{ render_sorting_header("Id", "Id", "customer.get_all", page, per_page) }}
             </th>
             <th>
-              {{ render_sorting_header("NationalId", "NationalId", "customer.get_all", page, per_page) }}
+              {{ render_sorting_header("National-Id", "NationalId", "customer.get_all", page, per_page) }}
             </th>
             <th>
               {{ render_sorting_header("Surname", "Surname", "customer.get_all", page, per_page) }}
@@ -58,16 +63,12 @@
 
         <tbody>
           {% for c in customers %}
-            <tr>
-              <td>
-                <a href="{{ url_for('customer.get_one', id=c.Id) }}">
-                  {{ c.CustomerNumber }}
-                </a>
-              </td>
+            <tr class="clickable-row" data-href="{{ url_for('customer.get_one', id=c.Id) }}">
+              <td>{{ c.Id }}</td>
               <td>{{ c.NationalId }}</td>
               <td>{{ c.Surname }}</td>
               <td>{{ c.GivenName }}</td>
-              <td>{{ c.StreetAddress }}</td>
+              <td>{{ c.Streetaddress }}</td>
               <td>{{ c.City }}</td>
             </tr>
           {% endfor %}

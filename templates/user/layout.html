@@ -11,11 +11,25 @@
     {% include 'components/_navbar.html' %}
     
     <main>
-        {% block content %}
-        <!-- Each page will put its content here -->
-        {% endblock %}
+        <div class="container content-card">
+            {% block content %}
+            <!-- Each page will put its content here -->
+            {% endblock %}
+        </div>
     </main>
 
     {% include 'components/_footer.html' %}
+
+    <script>
+        document.addEventListener("click", function (e) {
+            const row = e.target.closest(".clickable-row");
+            if (!row) return;
+
+            if (e.target.closest("a")) return; // Ignore clicks on links
+
+            const href = row.getAttribute("data-href");
+            if (href) window.location.href = href;
+            });
+    </script>
 </body>
 </html>

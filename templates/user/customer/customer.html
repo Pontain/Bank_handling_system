@@ -1,10 +1,25 @@
 {% extends "user/layout.html" %}
 
-{% from "components/macros.html" import render_pagination, render_sorting_header %}
-
-{% block title %}Customer{% endblock %}
+{% block title %}Customer {{ customer.Id }}{% endblock %}
 
 {% block content %}
+
+<h1>{{ customer.GivenName }} {{ customer.Surname }}</h1>
+
+<div class="customer-info">
+  <p><strong>Customer ID:</strong> {{ customer.Id }}</p>
+  <p><strong>National ID:</strong> {{ customer.NationalId }}</p>
+  <p><strong>Address:</strong> {{ customer.Streetaddress }}, {{ customer.City }}</p>
+  <p><strong>Email:</strong> {{ customer.EmailAddress }}</p>
+  <p><strong>Phone:</strong> +{{ customer.TelephoneCountryCode }} {{ customer.Telephone }}</p>
+</div>
+
+<hr>
+
+<p class="total-balance">
+  <strong>Total balance:</strong>
+  {{ "%.2f"|format(total_balance) }}
+</p>
 
 <h2>Accounts</h2>
 
@@ -28,7 +43,7 @@
           </td>
           <td>{{ acc.AccountType.value if acc.AccountType else acc.AccountType }}</td>
           <td>{{ acc.Created }}</td>
-          <td class="right">{{ acc.Balance }}</td>
+          <td class="right">{{ "%.2f"|format(acc.Balance) }}</td>
         </tr>
       {% endfor %}
     </tbody>
@@ -36,4 +51,5 @@
 {% else %}
   <p>No accounts for this customer.</p>
 {% endif %}
+
 {% endblock %}
