@@ -4,21 +4,21 @@
     {{ pagination.first }} - {{ pagination.last }} of {{ pagination.total }}
   </div>
   <div class="pagination text-blue">
-    {% for page in pagination.iter_pages() %}
+    {% for page in pagination.iter_pages() %} {# skapar sidnummerlänkar #}
       {% if page %}
         {% if page != pagination.page %}
           <a href="{{ url_for(
     endpoint,
     page=page,
-    per_page=50,
-    sort_by=request.args.get('sort_by'),
-    sort_order=request.args.get('sort_order'),
-    q=request.args.get('q'),
-    city=request.args.get('city')
+    per_page=request.args.get('per_page', 50),
+    sort_by=request.args.get('sort_by', 'Id'),
+    sort_order=request.args.get('sort_order', 'asc'),
+    q=request.args.get('q', ''),
+    city=request.args.get('city', '')
 ) }}">{{ page }}</a>
 
         {% else %}
-          <strong>{{ page }}</strong>
+          <strong>{{ page }}</strong> {#} aktuell sida markeras med strong -> fet text #}
         {% endif %}
       {% else %}
         <span class=ellipsis>…</span>
@@ -27,12 +27,11 @@
   </div>
 {% endmacro %}
 
-{% macro render_sorting_header(column_name, sort_by, endpoint, page, per_page) %}
+{% macro render_sorting_header(column_name, sort_by, endpoint, page) %}
 <span>
     {{column_name}} 
     <a href="{{ url_for(endpoint,
     page=page,
-    per_page=50,
     sort_order='asc',
     sort_by=sort_by,
     q=request.args.get('q'),
@@ -41,7 +40,6 @@
 
 <a href="{{ url_for(endpoint,
     page=page,
-    per_page=50,
     sort_order='desc',
     sort_by=sort_by,
     q=request.args.get('q'),

@@ -13,6 +13,7 @@ load_dotenv()
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL")
+app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY")
 app.config.update(
     MAIL_SERVER="smtp.gmail.com",
     MAIL_PORT=587,
@@ -46,12 +47,13 @@ if __name__ == "__main__":
         with app.app_context():
             # We need the app_context when using the db outside of a request
             seedData(db)
-        server = Server(app.wsgi_app)
-        server.watch("templates/**/*.html")  # all HTML files recursively
-        server.watch("templates/components/*.html")  # or specific subfolder
-        server.watch("static/**/*.css")       # watch CSS recursively
-        server.watch("static/**/*.js")        # watch JS
+        # server = Server(app.wsgi_app)
+        # server.watch("templates/**/*.html")  # all HTML files recursively
+        # server.watch("templates/components/*.html")  # or specific subfolder
+        # server.watch("static/**/*.css")       # watch CSS recursively
+        # server.watch("static/**/*.js")        # watch JS
 
-        server.serve(open_url_delay=True)
+        # server.serve(open_url_delay=True)
+        app.run(debug=True)
     else:
         app.run()

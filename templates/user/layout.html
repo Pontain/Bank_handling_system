@@ -21,15 +21,26 @@
     {% include 'components/_footer.html' %}
 
     <script>
-        document.addEventListener("click", function (e) {
-            const row = e.target.closest(".clickable-row");
-            if (!row) return;
+        document.addEventListener("click", function (e) { // lyssnar på alla klick i dokumentet. e är ett eventobjekt som innehåller info om klicket.
+            const row = e.target.closest(".clickable-row"); // e.target är det element som blev klickat. closest() letar uppåt i DOM-trädet efter närmsta förälder som matchar selektorn.
+            if (!row) return; // Om klicket inte var inne i en rad, gör inget mer.
 
-            if (e.target.closest("a")) return; // Ignore clicks on links
+            if (e.target.closest("a")) return; // Scriptet ignorerar klick på länkar så att de fungerar som vanligt.
 
-            const href = row.getAttribute("data-href");
-            if (href) window.location.href = href;
+            const href = row.getAttribute("data-href"); // Hämta värdet av data-href-attributet från raden.
+            if (href) window.location.href = href; // Om href finns, navigera till den URL:en.
             });
     </script>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        <div class="flash-wrap">
+        {% for category, message in messages %}
+            <div class="flash {{ category }}">{{ message }}</div>
+        {% endfor %}
+        </div>
+    {% endif %}
+    {% endwith %}
+
 </body>
 </html>

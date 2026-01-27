@@ -1,0 +1,112 @@
+{% extends "user/layout.html" %}
+
+{% block content %}
+<div class="container text-primary">
+
+    <h1 style="text-align: center; margin-bottom: 2rem;">
+        Edit customer
+    </h1>
+
+    <form class="form-light" method="POST">
+        {{ form.hidden_tag() }}  {# CSRF token #}
+
+        <span>
+            <label>{{ form.given_name.label }}</label>
+            {{ form.given_name(class="form-control") }}
+            {% for error in form.given_name.errors %}
+                <small class="text-danger">{{ error }}</small>
+            {% endfor %}
+        </span>
+
+        <span>
+            <label>{{ form.surname.label }}</label>
+            {{ form.surname(class="form-control") }}
+            {% for error in form.surname.errors %}
+                <small class="text-danger">{{ error }}</small>
+            {% endfor %}
+        </span>
+
+        <span>
+            <label>{{ form.streetaddress.label }}</label>
+            {{ form.streetaddress() }}
+            {% for error in form.streetaddress.errors %}
+                <small class="text-danger">{{ error }}</small>
+            {% endfor %}
+        </span>
+
+        <span>
+            <label>{{ form.city.label }}</label>
+            {{ form.city() }}
+            {% for error in form.city.errors %}
+                <small class="text-danger">{{ error }}</small>
+            {% endfor %}
+        </span>
+
+        <span>
+            <label>{{ form.zipcode.label }}</label>
+            {{ form.zipcode() }}
+            {% for error in form.zipcode.errors %}
+                <small class="text-danger">{{ error }}</small>
+            {% endfor %}
+        </span>
+
+        <span>
+            <label>{{ form.country.label }}</label>
+            {{ form.country() }}
+            {% for error in form.country.errors %}
+                <small class="text-danger">{{ error }}</small>
+            {% endfor %}
+        </span>
+
+        <span>
+            <label>{{ form.country_code.label }}</label>
+            {{ form.country_code() }}
+            {% for error in form.country_code.errors %}
+                <small class="text-danger">{{ error }}</small>
+            {% endfor %}
+        </span>
+
+        <span>
+            <label>{{ form.birthday.label }}</label>
+            {{ form.birthday(type="date") }}
+            {% for error in form.birthday.errors %}
+                <small class="text-danger">{{ error }}</small>
+            {% endfor %}
+        </span>
+
+        <span>
+            <label>{{ form.national_id.label }}</label>
+            {{ form.national_id(readonly = True) }}
+            {% for error in form.national_id.errors %}
+                <small class="text-danger">{{ error }}</small>
+            {% endfor %}
+        </span>
+
+        <span>
+            <label>{{ form.telephone.label }}</label>
+            {{ form.telephone() }}
+            {% for error in form.telephone.errors %}
+                <small class="text-danger">{{ error }}</small>
+            {% endfor %}
+        </span>
+
+        <span>
+            <label>{{ form.email.label }}</label>
+            {{ form.email() }}
+            {% for error in form.email.errors %}
+                <small class="text-danger">{{ error }}</small>
+            {% endfor %}
+        </span>
+
+        <div class="form-actions">
+            {{ form.submit(class="btn btn-primary", value="Create customer") }}
+            <a href="{{ url_for('customer.get_one', id=customer.Id) }}"
+            class="btn btn-danger">
+                Cancel
+            </a>
+
+        </div>
+
+    </form>
+</div>
+{% endblock %}

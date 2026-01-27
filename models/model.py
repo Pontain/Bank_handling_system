@@ -1,10 +1,11 @@
+from datetime import datetime
 from enum import Enum as PyEnum
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import Integer, text, Numeric
 from decimal import Decimal
 from typing import Annotated
 from database import db
-
+from models.mixin import SoftDeletionMixin, TimestampMixin
 
 
 class Types:
@@ -13,21 +14,20 @@ class Types:
     ]
 
 
-class Customer(db.Model):
+class Customer(TimestampMixin, SoftDeletionMixin, db.Model):
     __tablename__ = "customers"
     Id: Mapped[Types.int_pk]
-    GivenName = mapped_column(db.String(50), unique=False, nullable=False)
-    Surname = mapped_column(db.String(50), unique=False, nullable=False)
-    Streetaddress = mapped_column(db.String(50), unique=False, nullable=False)
-    City = mapped_column(db.String(50), unique=False, nullable=False)
-    Zipcode = mapped_column(db.String(10), unique=False, nullable=False)
-    Country = mapped_column(db.String(30), unique=False, nullable=False)
-    CountryCode = mapped_column(db.String(2), unique=False, nullable=False)
-    Birthday = mapped_column(db.DateTime, unique=False, nullable=False)
-    NationalId = mapped_column(db.String(20), unique=False, nullable=False)
-    TelephoneCountryCode = mapped_column(db.Integer, unique=False, nullable=False)
-    Telephone = mapped_column(db.String(20), unique=False, nullable=False)
-    EmailAddress = mapped_column(db.String(50), unique=False, nullable=False)
+    GivenName: Mapped[str] = mapped_column(db.String(50), unique=False, nullable=False)
+    Surname: Mapped[str] = mapped_column(db.String(50), unique=False, nullable=False)
+    Streetaddress: Mapped[str] = mapped_column(db.String(50), unique=False, nullable=False)
+    City: Mapped[str] = mapped_column(db.String(50), unique=False, nullable=False)
+    Zipcode: Mapped[str] = mapped_column(db.String(10), unique=False, nullable=False)
+    Country: Mapped[str] = mapped_column(db.String(30), unique=False, nullable=False)
+    CountryCode: Mapped[str] = mapped_column(db.String(2), unique=False, nullable=False)
+    Birthday: Mapped[datetime] = mapped_column(db.DateTime, unique=False, nullable=False)
+    NationalId: Mapped[str] = mapped_column(db.String(20), unique=False, nullable=False)
+    Telephone: Mapped[str] = mapped_column(db.String(20), unique=False, nullable=False)
+    EmailAddress: Mapped[str] = mapped_column(db.String(50), unique=False, nullable=False)
 
     Accounts = db.relationship("Account", backref="customer", lazy=True)
 
@@ -38,7 +38,7 @@ class AccountType(PyEnum):
     SAVINGS = "SAVINGS"
 
 
-class Account(db.Model):
+class Account(TimestampMixin, db.Model):
     __tablename__ = "accounts"
     Id: Mapped[Types.int_pk]
     AccountType = mapped_column(
@@ -48,7 +48,6 @@ class Account(db.Model):
         unique=False,
         nullable=False,
     )
-    Created = mapped_column(db.DateTime, unique=False, nullable=False)
     Balance = mapped_column(Numeric(18, 2), unique=False, nullable=False)
     Transactions = db.relationship("Transaction", backref="account", lazy=True)
     CustomerId = mapped_column(
@@ -56,7 +55,7 @@ class Account(db.Model):
     )
 
 
-class Transaction(db.Model):
+class Transaction(TimestampMixin, db.Model):
     __tablename__ = "transactions"
     Id: Mapped[Types.int_pk]
     Type = mapped_column(db.String(20), unique=False, nullable=False)

@@ -9,29 +9,38 @@
 
 <div class="container">
 
-  <h1 class="text-secondary">Customers</h1>
-  <p class="text-secondary">Search results / customer list</p>
+  <div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h1 class="text-secondary">Customers</h1>
+    <p class="text-secondary">Search results / customer list</p>
+  </div>
+
+  <div class="action-buttons">
+    <a href="{{ url_for('customer.create_customer') }}"
+       class="btn btn-primary create-btn">
+      + Create customer
+    </a>
+  </div>
+</div>
+
 
   <form method="get" action="{{ url_for('customer.by_id') }}" class="search-form">
-  <input type="number" name="id" placeholder="Customer id" min="1" required>
-  <button type="submit" class="btn btn-primary">Open</button>
+    <input type="number" name="id" placeholder="Customer id" min="1" required>
+    <button type="submit" class="btn btn-primary">Open</button>
   </form>
 
-  {# Om du vill ha sökform här senare kan du lägga den ovanför tabellen #}
-
   <form method="get" action="{{ url_for('customer.get_all') }}" class="search-form">
-  <input type="text" name="q" placeholder="Search name" value="{{ q|default('') }}">
-  <input type="text" name="city" placeholder="Search city" value="{{ city|default('') }}">
+    <input type="text" name="q" placeholder="Search name" value="{{ q|default('') }}">
+    <input type="text" name="city" placeholder="Search city" value="{{ city|default('') }}">
 
-  {# behåll sort vid ny sökning #}
-  <input type="hidden" name="sort_by" value="{{ sort_by }}">
-  <input type="hidden" name="sort_order" value="{{ sort_order }}">
-  <input type="hidden" name="per_page" value="{{ per_page }}">
+    <input type="hidden" name="sort_by" value="{{ sort_by }}">
+    <input type="hidden" name="sort_order" value="{{ sort_order }}">
+    <input type="hidden" name="per_page" value="{{ per_page }}">
 
-  <button class="btn btn-primary" type="submit">Search</button>
+    <button class="btn btn-primary" type="submit">Search</button>
+    <a class="btn btn-secondary" href="{{ url_for('customer.get_all') }}">Clear</a>
+  </form>
 
-  <a class="btn" href="{{ url_for('customer.get_all') }}">Rensa</a>
-</form>
 
 
   {% if customers and customers|length > 0 %}
@@ -41,22 +50,22 @@
         <thead>
           <tr>
             <th>
-              {{ render_sorting_header("Id", "Id", "customer.get_all", page, per_page) }}
+              {{ render_sorting_header("Id", "Id", "customer.get_all", page) }}
             </th>
             <th>
-              {{ render_sorting_header("National-Id", "NationalId", "customer.get_all", page, per_page) }}
+              {{ render_sorting_header("National-Id", "NationalId", "customer.get_all", page) }}
             </th>
             <th>
-              {{ render_sorting_header("Surname", "Surname", "customer.get_all", page, per_page) }}
+              {{ render_sorting_header("Surname", "Surname", "customer.get_all", page) }}
             </th>
             <th>
-              {{ render_sorting_header("GivenName", "GivenName", "customer.get_all", page, per_page) }}
+              {{ render_sorting_header("GivenName", "GivenName", "customer.get_all", page) }}
             </th>
             <th>
-              {{ render_sorting_header("Streetaddress", "Streetaddress", "customer.get_all", page, per_page) }}
+              {{ render_sorting_header("Streetaddress", "Streetaddress", "customer.get_all", page) }}
             </th>
             <th>
-              {{ render_sorting_header("City", "City", "customer.get_all", page, per_page) }}
+              {{ render_sorting_header("City", "City", "customer.get_all", page) }}
             </th>
           </tr>
         </thead>

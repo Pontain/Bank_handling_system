@@ -184,6 +184,8 @@ footer p { margin-bottom: 0; text-align: center; }
   transition: background-color 0.2s, color 0.2s;
 }
 a.btn.btn-primary { text-decoration: none; }
+a.btn.btn-secondary { text-decoration: none; }
+a.btn.btn-danger { text-decoration: none; }
 
 .btn-primary {
   background-color: var(--color-btn-primary);
@@ -198,6 +200,33 @@ a.btn.btn-primary { text-decoration: none; }
   border: 1px solid var(--color-btn-secondary-border);
 }
 .btn-secondary:hover { background-color: var(--color-btn-secondary-hover); }
+
+.action-buttons{
+  margin-bottom: 1rem;
+}
+
+.action-buttons .btn{
+  height: 3rem;
+  display: inline-flex;
+  align-items: center;
+  font-weight: var(--font-weight-medium);
+}
+
+.btn-danger{
+  background-color: #dc2626;
+  color: #fff;
+  border: 1px solid var(--color-btn-primary-border);
+}
+
+.btn-danger:hover{
+  background-color: #b91c1c;
+}
+
+.create-btn{
+  height: 3rem;
+  display: inline-flex;
+  align-items: center;  /* luft under knappen */
+}
 
 /* =========================================================
    HERO (Home)
@@ -347,6 +376,216 @@ main h3 {
   color: var(--text-color-dark);
 }
 
+input {height: 3rem;
+padding-left: 0.5rem;
+border-radius: var(--border-radius-pill);}
+
+table th, table td {
+  white-space: nowrap;
+
+}
+
+/* =========================================================
+   SEARCH FORMS (Customers page)
+   ========================================================= */
+
+.search-form{
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;        /* luft mellan inputs & knappar */
+  margin-bottom: 1rem;
+  padding: 0;
+}
+
+.search-form input{
+  border-radius: var(--border-radius-m); /* istället för pill */
+  height: 3rem;
+  padding: 0.5rem 0.75rem;
+  min-width: 180px;
+}
+
+.search-form button,
+.search-form a.btn{
+  height: 3rem;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* =========================================================
+   FORMS (only styled forms)
+   ========================================================= */
+
+.form-light,
+.form-dark{
+  margin-bottom: 2rem;
+  border-radius: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 2rem 0;
+}
+
+.form-light h3,
+.form-dark h3{
+  text-align: center;
+}
+
+.form-light > *,
+.form-dark > *{
+  width: 90%;
+  margin: 0 auto;
+}
+
+.form-light > span,
+.form-dark > span{
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.form-light input,
+.form-light textarea,
+.form-dark input,
+.form-dark textarea{
+  border-radius: 8px;
+  height: 3rem;
+  padding: 0.75rem;
+}
+
+.form-light textarea,
+.form-dark textarea{
+  resize: vertical;
+}
+
+/* focus */
+.form-light input:focus,
+.form-light textarea:focus{
+  outline: none;
+}
+
+.form-dark input:focus,
+.form-dark textarea:focus{
+  outline: 1px solid #4a6283;
+  box-shadow: 0 0 8px 3px #4a628360;
+}
+
+/* colors */
+.form-light{
+  background-color: white;
+}
+.form-light input,
+.form-light textarea{
+  border: 1px solid black;
+}
+.form-light label,
+.form-light h3{
+  color: black;
+}
+
+.form-dark{
+  background-color: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: rgba(255, 255, 255, 0.85);
+}
+.form-dark input,
+.form-dark textarea{
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background-color: rgba(255, 255, 255, 0.05);
+  color: white;
+}
+
+.form-light button:last-child,
+.form-dark button:last-child{
+  margin-top: 1rem;
+}
+.form-actions .btn{
+  height: 3rem;
+  min-width: 160px;          /* 🔑 detta löser skillnaden */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 1.25rem;
+}
+
+/* =========================
+   ACCOUNT ACTIONS – COMPACT
+   ========================= */
+
+.account-actions-compact {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.action-row-compact {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.action-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.action-inline {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* Inputs behåller din befintliga look */
+.action-inline input {
+  width: 180px; /* samma känsla som innan */
+}
+
+/* Transfer lite bredare */
+.action-form:last-child .action-inline input {
+  width: 160px;
+}
+
+
+
+/* Customers-style inputs (lätt rundade, inte pill) */
+.search-form input {
+  border-radius: 8px;     /* lätt rundat */
+  height: 3rem;
+  padding: 0.75rem;
+}
+
+/* Actions layout */
+.actions-compact {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.actions-row {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.action-form {
+  padding: 0;             /* din globala form-style lägger annars på padding */
+  margin: 0;
+  gap: 0.75rem;
+  flex-direction: row;    /* inputs och knappar på rad */
+  align-items: center;
+  width: fit-content;
+}
+
+/* Transfer-raden: lite mer plats men fortfarande kompakt */
+.actions-compact > .action-form {
+  flex-wrap: wrap;
+}
+
+
+
+
+
+
 /* =========================================================
    RESPONSIVE
    ========================================================= */
@@ -400,4 +639,23 @@ main h3 {
   }
 
   .home-hero .hero-text { text-align: center; }
+}
+
+@media (max-width: 768px) {
+  .action-row {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 768px) {
+  .action-row-compact {
+    flex-direction: column;
+  }
+
+  .action-inline {
+    flex-wrap: wrap;
+  }
+
+  .action-inline input {
+    width: 100%;
+  }
 }
