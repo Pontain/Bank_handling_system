@@ -3,15 +3,22 @@
 {% block title %}Account {{ account.Id }}{% endblock %}
 
 {% block content %}
-<div class="container">
+<div class="card page-card">
+
+  <a href="{{ url_for('customer.get_one', id=account.CustomerId) }}"
+     class="btn btn-primary mb-3">
+    ← Back to customer
+  </a>
 
   <h1 class="text-secondary">Account {{ account.Id }}</h1>
 
-  <div class="card">
+  <div class="card info-card">
     <p><strong>Type:</strong> {{ account.AccountType.value if account.AccountType else account.AccountType }}</p>
     <p><strong>Created:</strong> {{ account.created_at }}</p>
     <p><strong>Balance:</strong> {{ account.Balance }}</p>
   </div>
+
+</div>
 
   <hr>
 
@@ -21,26 +28,31 @@
 
   <div class="actions-row">
 
-    <form method="post" class="search-form action-form">
-      {{ deposit_form.hidden_tag() }}
-      {{ deposit_form.amount() }}
-      {{ deposit_form.submit(class="btn btn-primary") }}
-    </form>
+    <form method="post"
+      action="{{ url_for('account.deposit', account_id=account.Id) }}"
+      class="search-form action-form">
+  {{ deposit_form.hidden_tag() }}
+  {{ deposit_form.amount() }}
+  {{ deposit_form.submit(class="btn btn-primary") }}
+</form>
 
-    <form method="post" class="search-form action-form">
-      {{ withdraw_form.hidden_tag() }}
-      {{ withdraw_form.amount() }}
-      {{ withdraw_form.submit(class="btn btn-primary") }}
-    </form>
+<form method="post"
+      action="{{ url_for('account.withdraw', account_id=account.Id) }}"
+      class="search-form action-form">
+  {{ withdraw_form.hidden_tag() }}
+  {{ withdraw_form.amount() }}
+  {{ withdraw_form.submit(class="btn btn-primary") }}
+</form>
 
-  </div>
+<form method="post"
+      action="{{ url_for('account.transfer', account_id=account.Id) }}"
+      class="search-form action-form">
+  {{ transfer_form.hidden_tag() }}
+  {{ transfer_form.receiving_account_id() }}
+  {{ transfer_form.amount() }}
+  {{ transfer_form.submit(class="btn btn-primary") }}
+</form>
 
-  <form method="post" class="search-form action-form">
-    {{ transfer_form.hidden_tag() }}
-    {{ transfer_form.receiving_account_id() }}
-    {{ transfer_form.amount() }}
-    {{ transfer_form.submit(class="btn btn-primary") }}
-  </form>
 
 </div>
 

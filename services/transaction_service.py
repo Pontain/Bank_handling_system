@@ -155,7 +155,7 @@ class TransactionService:
         # Två transaktioner, samma commit (atomärt)
         tx_out = Transaction(
             Type="DEBIT",
-            Operation=f"Transfer to {to_acc.Id}",
+            Operation=f"Transfer to account nr: {to_acc.Id}",
             Date=datetime.now(),
             Amount=amt,
             NewBalance=new_from,
@@ -164,7 +164,7 @@ class TransactionService:
 
         tx_in = Transaction(
             Type="CREDIT",
-            Operation=f"Transfer from {from_acc.Id}",
+            Operation=f"Transfer from account nr: {from_acc.Id}",
             Date=datetime.now(),
             Amount=amt,
             NewBalance=new_to,

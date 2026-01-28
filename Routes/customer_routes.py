@@ -79,17 +79,16 @@ def create_customer():
         customer = Customer()
         apply_customer_form(customer, form)
 
-        db.session.add(customer)
-        db.session.commit()
+        CustomerService.create_with_default_account(customer)
 
         flash("Customer created", "success")
         return redirect(url_for("customer.get_all"))
 
-    if request.method == "POST" and not form.validate_on_submit():
+    if request.method == "POST":
         flash(f"Form errors: {form.errors}", "danger")
 
-
     return render_template("user/customer/create_customer.html", form=form)
+
 
 
 @customer_bp.route("/<int:id>/edit", methods=["GET", "POST"])

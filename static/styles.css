@@ -342,6 +342,84 @@ main > .container {
   margin: 1rem 0 2rem 0;
 }
 
+.page-card {
+  padding: 20px;          /* eller 1.25rem */
+}
+
+.info-card {
+  margin-top: 12px;
+}
+.soft-card {
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(6px);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.4rem 0;
+}
+
+.info-row + .info-row {
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.label {
+  color: #6c757d;
+  font-size: 0.85rem;
+}
+
+.value {
+  font-weight: 500;
+}
+
+.glass-left {
+  background: rgba(255, 255, 255, 0.65); /* matcha account */
+  backdrop-filter: blur(6px);
+  border-radius: 12px;
+  padding: 1,25rem 1.5rem;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  max-width: 520px;
+  margin-right: auto;
+}
+
+.info-grid {
+  display: grid;
+  row-gap: 0.5rem;
+}
+
+.info-row {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  align-items: start;
+}
+
+.label {
+  color: #6c757d;
+  font-size: 0.85rem;
+}
+
+.value {
+  font-weight: 500;
+}
+
+.card-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.card-actions .btn {
+  padding: 0.25rem 0.6rem;
+  font-size: 0.8rem;
+}
+.card-actions form {
+  margin: 0;
+}
 /* =========================================================
    PAGINATION
    ========================================================= */
@@ -581,7 +659,34 @@ table th, table td {
   flex-wrap: wrap;
 }
 
+/* =========================
+   ALERTS / FLASH MESSAGES
+   ========================= */
 
+.flash-container {
+  margin-bottom: 1rem;
+}
+
+.alert {
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  margin-bottom: 0.5rem;
+}
+
+.alert-danger {
+  background: #fdecea;
+  color: #611a15;
+}
+
+.alert-warning {
+  background: #fff4e5;
+  color: #663c00;
+}
+
+.alert-success {
+  background: #edf7ed;
+  color: #1e4620;
+}
 
 
 

@@ -1,6 +1,6 @@
 from typing import Any
 from database import db
-from models.model import Customer
+from models.model import Customer, Account, AccountType
 from sqlalchemy import select, or_
 
 class CustomerService:
@@ -13,6 +13,29 @@ class CustomerService:
         "NationalId": Customer.NationalId,
         "Streetaddress": Customer.Streetaddress
     }
+
+    @staticmethod
+    def create_with_default_account(customer: Customer) -> Customer:
+        """
+        Skapar en kund och ett defaultkonto i samma transaktion.
+        """
+        try:
+            db.session.add(customer)
+            db.session.flush()  # ger customer.Id utan commit
+
+            default_account = Account(
+                CustomerId=customer.Id,
+                AccountType=AccountType.PERSONAL,
+                Balance=0
+            )
+            db.session.add(default_account)
+
+            db.session.commit()
+            return customer
+        except Exception:
+            db.session.rollback()
+            raise
+
 
     @staticmethod
     def get_paginated(page: int, per_page: int, sort_by: str, sort_order: str, q: str = "", city: str = ""):
