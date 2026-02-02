@@ -1,7 +1,9 @@
 from datetime import datetime, timedelta
 import random
 from faker import Faker
-from models.model import Customer, Account, AccountType, Transaction
+from models.model import Customer, Account, AccountType, Transaction, StaffUser, StaffRole
+from sqlalchemy import select
+from database import db
 
 
 def seedData(db):
@@ -99,3 +101,43 @@ def seedData(db):
         antal += 1
 
     db.session.commit()
+
+from database import db
+from models.model import StaffUser, StaffRole
+from sqlalchemy import select
+
+def seed_staff():
+
+
+    staff_data = [
+        ("admin", [StaffRole.ADMIN]),
+        ("cashier1", [StaffRole.CASHIER]),
+        ("cashier2", [StaffRole.CASHIER]),
+        ("supervisor", [StaffRole.ADMIN, StaffRole.CASHIER]),  # exempel på flera roller
+        ("inactive_cashier", [StaffRole.CASHIER]),
+    ]
+
+    try:
+        for username, roles in staff_data:
+            # Finns användaren redan?
+            stmt = select(StaffUser).where(StaffUser.Username == username)
+            user = db.session.execute(stmt).scalars().first()
+
+            if not user:
+                user = StaffUser(Username=username, PasswordHash=None, IsActive=True)
+                db.session.add(user)
+                db.session.flush()  # ger user.Id
+
+            # Exempel: en av dem ska vara inaktiv
+            if username == "inactive_cashier":
+                user.IsActive = False
+
+            # Sätt roller (add_role skyddar mot dubletter)
+            for r in roles:
+                user.add_role(r)
+
+        db.session.commit()
+
+    except Exception:
+        db.session.rollback()
+        raise

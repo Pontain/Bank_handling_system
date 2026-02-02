@@ -4,10 +4,11 @@ from flask_migrate import Migrate
 from livereload import Server
 from database import db
 from dotenv import load_dotenv
-from seed import seedData
+from seed import seedData, seed_staff
 from services.statistics import Statistics
 from Routes.customer_routes import customer_bp
 from Routes.account_routes import account_bp
+from Routes.admin_routes import admin_bp
 
 load_dotenv()
 
@@ -28,6 +29,7 @@ db.init_app(app)
 migrate = Migrate(app, db)
 app.register_blueprint(customer_bp)
 app.register_blueprint(account_bp)
+app.register_blueprint(admin_bp)
 
 
 @app.route("/")
@@ -40,6 +42,18 @@ def home():
 # Flask kör all logik i routen och skickar färdiga värden till templaten
 # med dessa värden innan sidan skickas till klienten.
 
+@app.route("/country/<string:country_code>")
+def country_details(country_code: str):
+    stats_service = Statistics(db.session)
+
+    top_customers = stats_service.top_customers_by_country(country_code, limit=10)
+
+    return render_template(
+        "/country.html",
+        country_code=country_code,
+        top_customers=top_customers
+    )
+
 
 if __name__ == "__main__":
 
@@ -47,6 +61,7 @@ if __name__ == "__main__":
         with app.app_context():
             # We need the app_context when using the db outside of a request
             seedData(db)
+            seed_staff()
         # server = Server(app.wsgi_app)
         # server.watch("templates/**/*.html")  # all HTML files recursively
         # server.watch("templates/components/*.html")  # or specific subfolder

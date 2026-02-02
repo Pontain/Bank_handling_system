@@ -78,6 +78,26 @@
             <p class="text-secondary">No account balances available.</p> <!-- Visas om listan är tom, sk. fallback-text. -->
         {% endif %}
 
+    <!-- Länkar till Top 10 per land -->
+    {% if countries %}
+    <div class="stats-card">
+        <small>View Top 10 customers by country</small>
+
+        <div style="margin-top: 0.5rem;">
+        {% for country in countries %}
+            <a
+            class="btn btn-secondary"
+            style="margin-right: 0.25rem;"
+            href="{{ url_for('country_details', country_code=country) }}"
+            >
+            {{ country }}
+            </a>
+        {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+
         
 </section>
 {% endblock %}

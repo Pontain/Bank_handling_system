@@ -1,0 +1,51 @@
+{# templates/user/admin/create_staff.html #}
+{% extends "user/layout.html" %}
+
+{% block title %}Create staff{% endblock %}
+
+{% block content %}
+
+<div class="container">
+
+  <h1 class="text-secondary">Create staff</h1>
+  <p class="text-secondary">Add a new staff user</p>
+
+  <form method="post" class="form">
+
+    <div class="form-group">
+      <label>Username</label>
+      <input type="text" name="username" required placeholder="Username">
+    </div>
+
+    <div class="form-group">
+      <label>Roles</label>
+
+      <div class="form-checkboxes">
+        <label>
+          <input type="checkbox" name="roles" value="CASHIER">
+          Cashier
+        </label>
+
+        <label>
+          <input type="checkbox" name="roles" value="ADMIN">
+          Admin
+        </label>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary">
+        Create staff
+      </button>
+
+      <a href="{{ url_for('admin.get_all_staff') }}"
+         class="btn btn-secondary">
+        Cancel
+      </a>
+    </div>
+
+  </form>
+
+</div>
+
+{% endblock %}

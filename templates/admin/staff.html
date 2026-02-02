@@ -1,0 +1,136 @@
+{# templates/user/admin/staff.html #}
+{% extends "user/layout.html" %}
+
+{% block title %}Staff {{ user.Id }}{% endblock %}
+
+{% block content %}
+
+<div class="container">
+
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+      <h1 class="text-secondary">{{ user.Username }}</h1>
+      <p class="text-secondary">Staff profile</p>
+    </div>
+
+    <div class="action-buttons">
+      <a href="{{ url_for('admin.get_all_staff') }}" class="btn btn-secondary">
+        ← Back
+      </a>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="customer-info">
+      <p><strong>Staff ID:</strong> {{ user.Id }}</p>
+
+      <p>
+        <strong>Status:</strong>
+        {% if user.IsActive %}
+          <span class="badge bg-success">Active</span>
+        {% else %}
+          <span class="badge bg-danger">Inactive</span>
+        {% endif %}
+      </p>
+
+      <p>
+        <strong>Roles:</strong>
+        {% if user.Roles and user.Roles|length > 0 %}
+          {% for ur in user.Roles %}
+            <span class="badge bg-secondary">{{ ur.Role.value }}</span>
+          {% endfor %}
+        {% else %}
+          <span class="text-secondary">No roles assigned</span>
+        {% endif %}
+      </p>
+
+      {# om du har timestamp fields från TimestampMixin kan du visa dem (valfritt) #}
+      {# <p><strong>Created:</strong> {{ user.CreatedAt }}</p> #}
+      {# <p><strong>Updated:</strong> {{ user.UpdatedAt }}</p> #}
+    </div>
+  </div>
+
+  <hr>
+
+  {# ACTIONS (koppla routes när du vill) #}
+  <div class="card">
+    <h2 class="text-secondary mb-3">Actions</h2>
+
+    <div class="d-flex flex-wrap gap-2">
+
+      {# Aktivera / Inaktivera #}
+      <form method="post" action="{{ url_for('admin.set_active', id=user.Id) }}">
+        {% if user.IsActive %}
+          <input type="hidden" name="is_active" value="0">
+          <button type="submit" class="btn btn-primary btn-danger">
+            Deactivate
+          </button>
+        {% else %}
+          <input type="hidden" name="is_active" value="1">
+          <button type="submit" class="btn btn-primary">
+            Activate
+          </button>
+        {% endif %}
+      </form>
+
+      {# Soft delete (valfritt) #}
+      {# 
+      <form method="post" action="{{ url_for('admin.soft_delete', id=user.Id) }}"
+            onsubmit="return confirm('Soft delete this staff user?');">
+        <button type="submit" class="btn btn-primary btn-danger">
+          Soft delete
+        </button>
+      </form>
+      #}
+
+    </div>
+  </div>
+
+  {# ROLLER (valfritt UI) - du kan börja utan dessa och lägga till sen #}
+  <div class="card mt-3">
+    <h2 class="text-secondary mb-3">Roles</h2>
+
+    <div class="d-flex flex-wrap gap-2">
+
+      {# Lägg till roll: CASHIER #}
+      <form method="post" action="{{ url_for('admin.add_role', id=user.Id) }}">
+        <input type="hidden" name="role" value="CASHIER">
+        <button type="submit" class="btn btn-primary">
+          + Cashier
+        </button>
+      </form>
+
+      {# Lägg till roll: ADMIN #}
+      <form method="post" action="{{ url_for('admin.add_role', id=user.Id) }}">
+        <input type="hidden" name="role" value="ADMIN">
+        <button type="submit" class="btn btn-primary">
+          + Admin
+        </button>
+      </form>
+
+      {# Ta bort roll: CASHIER #}
+      <form method="post" action="{{ url_for('admin.remove_role', id=user.Id) }}">
+        <input type="hidden" name="role" value="CASHIER">
+        <button type="submit" class="btn btn-primary btn-danger">
+          - Cashier
+        </button>
+      </form>
+
+      {# Ta bort roll: ADMIN #}
+      <form method="post" action="{{ url_for('admin.remove_role', id=user.Id) }}">
+        <input type="hidden" name="role" value="ADMIN">
+        <button type="submit" class="btn btn-primary btn-danger">
+          - Admin
+        </button>
+      </form>
+
+    </div>
+
+    <p class="text-secondary mt-2">
+      Tips: senare kan du byta detta till checkboxar + “Save roles”.
+    </p>
+  </div>
+
+</div>
+
+{% endblock %}

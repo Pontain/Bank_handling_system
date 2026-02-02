@@ -1,0 +1,35 @@
+{% extends "user/layout.html" %}
+{% block title %}Country {{ country_code }}{% endblock %}
+
+{% block content %}
+<section class="info">
+  <div class="container">
+    <h3 class="text-secondary">Top 10 customers in {{ country_code }}</h3>
+
+    {% if top_customers %}
+      <div class="table-wrap">
+        <table class="stats-table">
+          <thead>
+            <tr>
+              <th>Customer</th>
+              <th class="right">Total balance</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in top_customers %}
+              <tr>
+                <td>{{ row.given_name }} {{ row.surname }} (ID: {{ row.customer_id }})</td>
+                <td class="right">{{ "%.2f"|format(row.total_balance) }} kr</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="text-secondary">No customers found for {{ country_code }}.</p>
+    {% endif %}
+
+    <a class="btn btn-secondary" href="{{ url_for('home') }}">Back</a>
+  </div>
+</section>
+{% endblock %}
