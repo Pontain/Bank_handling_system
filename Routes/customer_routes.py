@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, abort, request, redirect, url_for, flash
 from services.customer_service import CustomerService
+from flask_security.decorators import auth_required, roles_required
 from decimal import Decimal
 from typing import cast
 from database import db
@@ -10,6 +11,8 @@ from utils.form_mappers import prefill_customer_form, apply_customer_form
 customer_bp = Blueprint('customer', __name__, url_prefix='/customer') # 'customer' efter Blueprint är namnet som länken i navbar letar efter.
 
 @customer_bp.route("/")
+@auth_required()
+@roles_required("CASHIER")
 def get_all():
 
     q = request.args.get("q", default= "", type=str).strip() # fritext-sökning
@@ -44,6 +47,8 @@ def get_all():
 
 
 @customer_bp.route("/<int:id>")
+@auth_required()
+@roles_required("CASHIER")
 def get_one(id: int):
     customer= CustomerService.get_by_id(id)
 
@@ -57,6 +62,8 @@ def get_one(id: int):
 
 
 @customer_bp.route("/by_id")
+@auth_required()
+@roles_required("CASHIER")
 def by_id():
     customer_id = request.args.get("id", type=int)
 
@@ -72,6 +79,8 @@ def by_id():
 
 
 @customer_bp.route("/create", methods=["GET", "POST"])
+@auth_required()
+@roles_required("CASHIER")
 def create_customer():
     form = CustomerCreateForm()
 
@@ -92,6 +101,8 @@ def create_customer():
 
 
 @customer_bp.route("/<int:id>/edit", methods=["GET", "POST"])
+@auth_required()
+@roles_required("CASHIER")
 def edit_customer(id: int):
     customer = CustomerService.get_by_id(id)
 
@@ -121,6 +132,8 @@ def edit_customer(id: int):
     )
 
 @customer_bp.post("/<int:id>/delete")
+@auth_required()
+@roles_required("CASHIER")
 def delete_customer(id: int):
     customer = CustomerService.get_by_id(id)
 

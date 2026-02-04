@@ -1,4 +1,3 @@
-{# templates/user/admin/admin.html #}
 {% extends "user/layout.html" %}
 
 {% from "components/macros.html" import render_pagination, render_sorting_header %}
@@ -16,7 +15,6 @@
     </div>
 
     <div class="action-buttons">
-      {# Visa bara om du har create-route #}
       <a href="{{ url_for('admin.create_staff') }}"
          class="btn btn-primary create-btn">
         + Create staff
@@ -24,29 +22,26 @@
     </div>
   </div>
 
-  {# Gå direkt till personal via id #}
   <form method="get" action="{{ url_for('admin.by_id') }}" class="search-form">
     <input type="number" name="id" placeholder="Staff id" min="1" required>
     <button type="submit" class="btn btn-primary">Open</button>
   </form>
 
-  {# Sök personal via username / ev. visa inaktiva #}
-  <form method="get" action="{{ url_for('admin.get_all_staff') }}" class="search-form">
-    <input type="text" name="q" placeholder="Search username" value="{{ q|default('') }}">
+  <form method="get" action="{{ url_for('admin.get_all_staff') }}" class="search-form staff-search-form">
+    <input type="text" name="q" placeholder="Search email" value="{{ q|default('') }}">
 
-    {# Behåll list-state vid sökning #}
     <input type="hidden" name="sort_by" value="{{ sort_by }}">
     <input type="hidden" name="sort_order" value="{{ sort_order }}">
     <input type="hidden" name="per_page" value="{{ per_page }}">
 
-    {# Checkbox: visa inaktiva #}
-    <label class="text-secondary" style="display:flex;align-items:center;gap:.5rem;">
-      <input type="checkbox" name="include_inactive" value="1"
+    <button class="btn btn-primary" type="submit">Search</button>
+
+    <label class="text-secondary staff-include-inactive">
+      <input class="staff-checkbox" type="checkbox" name="include_inactive" value="1"
              {% if include_inactive %}checked{% endif %}>
       Include inactive
     </label>
 
-    <button class="btn btn-primary" type="submit">Search</button>
     <a class="btn btn-secondary" href="{{ url_for('admin.get_all_staff') }}">Clear</a>
   </form>
 
@@ -57,13 +52,13 @@
         <thead>
           <tr>
             <th>
-              {{ render_sorting_header("Id", "Id", "admin.get_all_staff", page) }}
+              {{ render_sorting_header("Id", "id", "admin.get_all_staff", page) }}
             </th>
             <th>
-              {{ render_sorting_header("Username", "Username", "admin.get_all_staff", page) }}
+              {{ render_sorting_header("Username", "username", "admin.get_all_staff", page) }}
             </th>
             <th>
-              {{ render_sorting_header("Active", "IsActive", "admin.get_all_staff", page) }}
+              {{ render_sorting_header("Active", "active", "admin.get_all_staff", page) }}
             </th>
             <th>
               Roles
@@ -73,12 +68,12 @@
 
         <tbody>
           {% for u in staff %}
-            <tr class="clickable-row" data-href="{{ url_for('admin.get_one', id=u.Id) }}">
-              <td>{{ u.Id }}</td>
-              <td>{{ u.Username }}</td>
+            <tr class="clickable-row" data-href="{{ url_for('admin.get_one', id=u.id) }}">
+              <td>{{ u.id }}</td>
+              <td>{{ u.username }}</td>
 
               <td>
-                {% if u.IsActive %}
+                {% if u.active %}
                   <span class="badge bg-success">Yes</span>
                 {% else %}
                   <span class="badge bg-danger">No</span>
@@ -86,10 +81,9 @@
               </td>
 
               <td>
-                {# u.Roles är lista av StaffUserRole-objekt, ur.Role är enum #}
-                {% if u.Roles and u.Roles|length > 0 %}
-                  {% for ur in u.Roles %}
-                    <span class="badge bg-secondary">{{ ur.Role.value }}</span>
+                {% if u.roles and u.roles|length > 0 %}
+                  {% for r in u.roles %}
+                    <span class="badge bg-secondary">{{ r.name }}</span>
                   {% endfor %}
                 {% else %}
                   <span class="text-secondary">-</span>

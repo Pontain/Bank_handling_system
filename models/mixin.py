@@ -15,6 +15,9 @@ class SoftDeletionMixin:
     def soft_delete(self):
         self.is_deleted = True
         self.deleted_at = datetime.now()
+
+        if hasattr(self, "active"):
+            self.active = False
         
     def restore(self):
         self.is_deleted = False

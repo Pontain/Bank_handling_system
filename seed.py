@@ -1,9 +1,11 @@
+# pyright: reportIncompatibleVariableOverride=false
 from datetime import datetime, timedelta
 import random
 from faker import Faker
-from models.model import Customer, Account, AccountType, Transaction, StaffUser, StaffRole
+from models.model import Customer, Account, AccountType, Transaction, Employee, Role
 from sqlalchemy import select
 from database import db
+from flask_security.utils import hash_password
 
 
 def seedData(db):
@@ -102,42 +104,67 @@ def seedData(db):
 
     db.session.commit()
 
-from database import db
-from models.model import StaffUser, StaffRole
-from sqlalchemy import select
-
-def seed_staff():
 
 
-    staff_data = [
-        ("admin", [StaffRole.ADMIN]),
-        ("cashier1", [StaffRole.CASHIER]),
-        ("cashier2", [StaffRole.CASHIER]),
-        ("supervisor", [StaffRole.ADMIN, StaffRole.CASHIER]),  # exempel på flera roller
-        ("inactive_cashier", [StaffRole.CASHIER]),
-    ]
+def seed_security_staff(db, user_datastore):
+    # Skapa roller
+    for role_name, desc in [
+        ("ADMIN", "Admin handles employees"),
+        ("CASHIER", "Cashier handles accounts and transactions"),
+    ]:
+        user_datastore.find_or_create_role(
+            name=role_name,
+            description=desc,
+        )
 
-    try:
-        for username, roles in staff_data:
-            # Finns användaren redan?
-            stmt = select(StaffUser).where(StaffUser.Username == username)
-            user = db.session.execute(stmt).scalars().first()
+    db.session.commit()
 
-            if not user:
-                user = StaffUser(Username=username, PasswordHash=None, IsActive=True)
-                db.session.add(user)
-                db.session.flush()  # ger user.Id
+    admin_role = user_datastore.find_role("ADMIN")
+    cashier_role = user_datastore.find_role("CASHIER")
 
-            # Exempel: en av dem ska vara inaktiv
-            if username == "inactive_cashier":
-                user.IsActive = False
+    # Admin
+    if not user_datastore.find_user(email="admin@test.se"):
+        user_datastore.create_user(
+            email="admin@test.se",
+            username="Admin",
+            password=hash_password("Hejsan123!"),
+            roles=[admin_role],
+        )
 
-            # Sätt roller (add_role skyddar mot dubletter)
-            for r in roles:
-                user.add_role(r)
+    # Cashier
+    if not user_datastore.find_user(email="cashier@test.se"):
+        user_datastore.create_user(
+            email="cashier@test.se",
+            username="Cashier",
+            password=hash_password("Hejsan123!"),
+            roles=[cashier_role],
+        )
 
-        db.session.commit()
+    # Supervisor (båda rollerna)
+    if not user_datastore.find_user(email="supervisor@test.se"):
+        user_datastore.create_user(
+            email="supervisor@test.se",
+            username="Supervisor",
+            password=hash_password("Hejsan123!"),
+            roles=[admin_role, cashier_role],
+        )
 
-    except Exception:
-        db.session.rollback()
-        raise
+    # Kimmo-Admin
+    if not user_datastore.find_user(email="kimmo.ahola@systementor.se"):
+        user_datastore.create_user(
+            email="kimmo.ahola@systementor.se",
+            username="Kimmo-Admin",
+            password=hash_password("Hejsan123!"),
+            roles=[admin_role],
+        )
+
+    # Kimmo-Cashier
+    if not user_datastore.find_user(email="kimmo.ahola@webbramverk.se"):
+        user_datastore.create_user(
+            email="kimmo.ahola@webbramverk.se",
+            username="Kimmo-Cashier",
+            password=hash_password("Hejsan123!"),
+            roles=[cashier_role],
+        )
+
+    db.session.commit()

@@ -1,4 +1,3 @@
-{# templates/user/admin/create_staff.html #}
 {% extends "user/layout.html" %}
 
 {% block title %}Create staff{% endblock %}
@@ -13,23 +12,45 @@
   <form method="post" class="form">
 
     <div class="form-group">
+      <label>Email</label>
+      <input
+        type="email"
+        name="email"
+        required
+        placeholder="email@example.com"
+      >
+    </div>
+
+    <div class="form-group">
       <label>Username</label>
-      <input type="text" name="username" required placeholder="Username">
+      <input
+        type="text"
+        name="username"
+        required
+        placeholder="Username"
+      >
+    </div>
+
+    <div class="form-group">
+      <label>Password</label>
+      <input
+        type="password"
+        name="password"
+        required
+        placeholder="Temporary password"
+      >
     </div>
 
     <div class="form-group">
       <label>Roles</label>
 
       <div class="form-checkboxes">
-        <label>
-          <input type="checkbox" name="roles" value="CASHIER">
-          Cashier
-        </label>
-
-        <label>
-          <input type="checkbox" name="roles" value="ADMIN">
-          Admin
-        </label>
+        {% for role in roles %}
+          <label>
+            <input type="checkbox" name="roles" value="{{ role.name }}">
+            {{ role.name }}
+          </label>
+        {% endfor %}
       </div>
     </div>
 

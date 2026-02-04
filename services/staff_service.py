@@ -1,57 +1,108 @@
-from __future__ import annotations # även bra för att import-ordningen inte spelar någon roll
+from __future__ import annotations
 
 from typing import Any
 from sqlalchemy import select, or_
 from sqlalchemy.orm import selectinload
 
 from database import db
-from models.model import StaffUser, StaffRole
+from models.model import Employee, Role
+
+from flask_security.utils import hash_password
 
 
 class StaffService:
+    """
+    Service för personal (employees) baserat på Flask-Security modeller.
 
-    # Service för personal (staff_users).
-    # Admin kommer kunna:
-    #   - lista personal
-    #   - skapa personal
-    #   - inaktivera (soft delete / is_active)
-    #   - sätta / ta bort roller
-
+    Admin kan:
+      - lista personal (paginering/sök/sort)
+      - skapa personal (med hashat lösenord)
+      - aktivera/inaktivera (active)
+      - sätta / ta bort roller (many-to-many via roles)
+    """
 
     SORT_COLUMNS: dict[str, Any] = {
-        "Id": StaffUser.Id,
-        "Username": StaffUser.Username,
-        "IsActive": StaffUser.IsActive,
+        "id": Employee.id,
+        "email": Employee.email,
+        "username": Employee.username,
+        "active": Employee.active,
     }
 
-
+    # ----------------------------
+    # CREATE
+    # ----------------------------
     @staticmethod
-    def create_user(username: str, roles: list[StaffRole] | None = None) -> StaffUser:
-
-        # Skapar en personal-användare.
-        # Lösenord sätts senare.
-
+    def create_user(
+        email: str,
+        username: str,
+        password_plain: str,
+        role_names: list[str] | None = None,
+        active: bool = True,
+    ) -> Employee:
+        """
+        Skapar en Employee med hashat lösenord och valfria roller.
+        role_names är t.ex. ["ADMIN", "CASHIER"].
+        """
         try:
-            user = StaffUser(
-                Username=username,
-                PasswordHash=None,
-                IsActive=True,
+            user = Employee(
+                email=email.lower().strip(),
+                username=username.strip(),
+                password=hash_password(password_plain),
+                active=active,
             )
 
-            # Lägg roller direkt (valfritt)
-            if roles:
-                for role in roles:
-                    user.add_role(role)
+            if role_names:
+                roles = StaffService.get_roles_by_names(role_names)
+                user.roles = roles
 
             db.session.add(user)
             db.session.commit()
             return user
-
         except Exception:
             db.session.rollback()
             raise
 
-    # Lista all personal
+    # ----------------------------
+    # READ
+    # ----------------------------
+    @staticmethod
+    def get_by_id(employee_id: int) -> Employee | None:
+        stmt = (
+            select(Employee)
+            .options(selectinload(Employee.roles))
+            .where(Employee.id == employee_id)
+        )
+        return db.session.execute(stmt).scalars().first()
+
+    @staticmethod
+    def get_by_email(email: str) -> Employee | None:
+        stmt = (
+            select(Employee)
+            .options(selectinload(Employee.roles))
+            .where(Employee.email == email.lower().strip())
+        )
+        return db.session.execute(stmt).scalars().first()
+
+    @staticmethod
+    def get_by_username(username: str) -> Employee | None:
+        stmt = (
+            select(Employee)
+            .options(selectinload(Employee.roles))
+            .where(Employee.username == username.strip())
+        )
+        return db.session.execute(stmt).scalars().first()
+
+    @staticmethod
+    def get_roles_by_names(role_names: list[str]) -> list[Role]:
+        """
+        Hämtar Role-objekt för givna rollnamn. Ignorerar namn som inte finns.
+        """
+        clean = [r.strip().upper() for r in role_names if r and r.strip()]
+        if not clean:
+            return []
+
+        stmt = select(Role).where(Role.name.in_(clean))
+        return list(db.session.execute(stmt).scalars().all())
 
     @staticmethod
     def get_paginated(
@@ -62,30 +113,28 @@ class StaffService:
         q: str = "",
         include_inactive: bool = False,
     ):
+        """
+        Hämtar personal paginerat.
+        - q söker i email/username
+        - include_inactive: om False visar vi bara active=True
+        """
+        sort_col = StaffService.SORT_COLUMNS.get(sort_by, Employee.id)
 
-        # Hämtar personal paginerat.
-        # - q söker i username
-        # - include_inactive: om False visar vi bara IsActive=True
-
-        sort_col = StaffService.SORT_COLUMNS.get(sort_by, StaffUser.Id)
-
-        stmt = select(StaffUser).options(
-            # gör att user.Roles redan finns redo utan N+1
-            selectinload(StaffUser.Roles)
+        stmt = (
+            select(Employee)
+            .where(Employee.is_deleted.is_(False))
+            .options(selectinload(Employee.roles))
         )
 
-        # soft delete-filter (om din SoftDeletionMixin har is_deleted)
-        # Anpassa om din mixin heter något annat.
-        stmt = stmt.where(StaffUser.is_deleted.is_(False))
-
         if not include_inactive:
-            stmt = stmt.where(StaffUser.IsActive.is_(True))
+            stmt = stmt.where(Employee.active.is_(True))
 
         if q:
             like = f"%{q}%"
             stmt = stmt.where(
                 or_(
-                    StaffUser.Username.ilike(like),
+                    Employee.email.ilike(like),
+                    Employee.username.ilike(like),
                 )
             )
 
@@ -93,110 +142,81 @@ class StaffService:
 
         return db.paginate(stmt, page=page, per_page=per_page, error_out=False)
 
-    # Hämta en user med id och sen med namn.
-    @staticmethod
-    def get_by_id(staff_user_id: int) -> StaffUser | None:
-
-        # Hämtar en user + roller.
-        # Här använder vi select för en och samma user, och laddar rollerna.
-
-        stmt = (
-            select(StaffUser)
-            .options(selectinload(StaffUser.Roles))
-            .where(StaffUser.Id == staff_user_id)
-            .where(StaffUser.is_deleted.is_(False))
-        )
-        return db.session.execute(stmt).scalars().first()
-
-    @staticmethod
-    def get_by_username(username: str) -> StaffUser | None:
-        stmt = (
-            select(StaffUser)
-            .options(selectinload(StaffUser.Roles))
-            .where(StaffUser.Username == username)
-            .where(StaffUser.is_deleted.is_(False))
-        )
-        return db.session.execute(stmt).scalars().first()
-
-    # Aktivera en user
-    @staticmethod
-    def set_active(staff_user_id: int, is_active: bool) -> None:
-        try:
-            user = db.session.get(StaffUser, staff_user_id)
-            if not user or user.is_deleted:
-                return
-
-            user.IsActive = is_active
-            db.session.commit()
-        except Exception:
-            db.session.rollback()
-            raise
-
-
-    @staticmethod
-    def add_role(staff_user_id: int, role: StaffRole) -> None:
-
-        # Lägger till en roll till user.
-        # Unik constraint + has_role() skyddar mot dubletter.
-
-        try:
-            user = StaffService.get_by_id(staff_user_id)
-            if not user:
-                return
-
-            user.add_role(role)
-            db.session.commit()
-        except Exception:
-            db.session.rollback()
-            raise
-
-    @staticmethod
-    def remove_role(staff_user_id: int, role: StaffRole) -> None:
-        try:
-            user = StaffService.get_by_id(staff_user_id)
-            if not user:
-                return
-
-            user.remove_role(role)
-            db.session.commit()
-        except Exception:
-            db.session.rollback()
-            raise
-
-    @staticmethod
-    def set_roles(staff_user_id: int, roles: list[StaffRole]) -> None:
-      
-        try:
-            user = StaffService.get_by_id(staff_user_id)
-            if not user:
-                return
-
-            # ta bort allt
-            user.Roles = []
-
-            # lägg till nya
-            for r in roles:
-                user.add_role(r)
-
-            db.session.commit()
-        except Exception:
-            db.session.rollback()
-            raise
-
     # ----------------------------
-    # DELETE (soft delete)
+    # UPDATE
     # ----------------------------
     @staticmethod
-    def soft_delete(staff_user_id: int) -> None:
-
+    def set_active(employee_id: int, is_active: bool) -> None:
         try:
-            user = db.session.get(StaffUser, staff_user_id)
+            user = db.session.get(Employee, employee_id)
+            if not user:
+                return
+            user.active = is_active
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
+            raise
+
+    @staticmethod
+    def set_roles(employee_id: int, role_names: list[str]) -> None:
+        """
+        Ersätter alla roller för en user med nya roller baserat på namn.
+        """
+        try:
+            user = db.session.get(Employee, employee_id)
             if not user:
                 return
 
-            user.is_deleted = True
+            roles = StaffService.get_roles_by_names(role_names)
+            user.roles = roles
 
             db.session.commit()
         except Exception:
             db.session.rollback()
             raise
+
+    @staticmethod
+    def add_role(employee_id: int, role_name: str) -> None:
+        try:
+            user = db.session.get(Employee, employee_id)
+            if not user:
+                return
+
+            role = db.session.execute(
+                select(Role).where(Role.name == role_name.strip().upper())
+            ).scalars().first()
+
+            if not role:
+                return
+
+            if role not in user.roles:
+                user.roles.append(role)
+
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
+            raise
+
+    @staticmethod
+    def remove_role(employee_id: int, role_name: str) -> None:
+        try:
+            user = db.session.get(Employee, employee_id)
+            if not user:
+                return
+
+            target = role_name.strip().upper()
+            user.roles = [r for r in user.roles if r.name != target]
+
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
+            raise
+
+    @staticmethod
+    def get_by_id_including_deleted(id: int):
+        stmt = (
+            select(Employee)
+            .where(Employee.id == id)
+            .options(selectinload(Employee.roles))
+        )
+        return db.session.scalar(stmt)
