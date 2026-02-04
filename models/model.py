@@ -1,7 +1,7 @@
 
 # pyright: reportIncompatibleVariableOverride=false
 import uuid
-from datetime import datetime
+from datetime import date
 from enum import Enum as PyEnum
 from flask_sqlalchemy.table import _Table
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -29,7 +29,7 @@ class Customer(TimestampMixin, SoftDeletionMixin, db.Model):
     Zipcode: Mapped[str] = mapped_column(db.String(10), unique=False, nullable=False)
     Country: Mapped[str] = mapped_column(db.String(30), unique=False, nullable=False)
     CountryCode: Mapped[str] = mapped_column(db.String(2), unique=False, nullable=False)
-    Birthday: Mapped[datetime] = mapped_column(db.DateTime, unique=False, nullable=False)
+    Birthday: Mapped[date | None] = mapped_column(db.Date, unique=False, nullable=False)
     NationalId: Mapped[str] = mapped_column(db.String(20), unique=False, nullable=False)
     Telephone: Mapped[str] = mapped_column(db.String(20), unique=False, nullable=False)
     EmailAddress: Mapped[str] = mapped_column(db.String(50), unique=False, nullable=False)

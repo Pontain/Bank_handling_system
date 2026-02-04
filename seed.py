@@ -1,5 +1,5 @@
 # pyright: reportIncompatibleVariableOverride=false
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 import random
 from faker import Faker
 from models.model import Customer, Account, AccountType, Transaction, Employee, Role
@@ -31,12 +31,16 @@ def seedData(db):
         customer.CountryCode = random.choice(countries)
 
         # Birthday & NationalId
-        customer.Birthday = fake.date_of_birth(minimum_age=18, maximum_age=90)
-        cc_number = fake.random_number(digits=4, fix_len=True)
-        customer.NationalId = customer.Birthday.strftime("%Y%m%d-") + str(cc_number)
+
+        birthday = date.fromisoformat(
+            fake.date_of_birth(minimum_age=18, maximum_age=90).isoformat()
+        )
+
+        customer.Birthday = birthday
+        cc_number: int = fake.random_number(digits=4, fix_len=True)
+        customer.NationalId = birthday.strftime("%Y%m%d-") + str(cc_number)
 
         # Phone & Email
-        customer.TelephoneCountryCode = 55
         customer.Telephone = fake.phone_number()
         customer.EmailAddress = fake.email().lower()
 
@@ -53,7 +57,7 @@ def seedData(db):
                 account.AccountType = AccountType.SAVINGS
 
             start = datetime.now() + timedelta(days=-random.randint(1000, 10000))
-            account.Created = start
+            account.created_at = start
             account.Balance = 0
 
             # Transactions
