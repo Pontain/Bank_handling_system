@@ -1,25 +1,27 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from decimal import Decimal, ROUND_HALF_UP
 from datetime import datetime
+from decimal import Decimal, ROUND_HALF_UP
 
 from sqlalchemy import select
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, scoped_session
 
 from database import db
 from models.model import Account, Transaction
 
 
-# Tydliga feltyper (lätta att fånga i routes och visa flash-meddelande)
+# -----------------------------
+# Exceptions
+# -----------------------------
 
 @dataclass
-class InsufficientFundsError(Exception): # Exception fångar alla fel som ärver från python inbyggda exception.
+class InsufficientFundsError(Exception):
     account_id: int
     balance: Decimal
     requested: Decimal
 
-    def __str__(self) -> str: # __str__ är som __repr__ men mer anpassat för användare.
+    def __str__(self) -> str:
         return (
             f"Otillräckligt saldo på konto {self.account_id}. "
             f"Saldo: {self.balance:.2f}, försök: {self.requested:.2f}"
@@ -30,33 +32,49 @@ class InvalidAmountError(Exception):
     pass
 
 
-# ---- Service ----
+# -----------------------------
+# Money helpers
+# -----------------------------
 
-TWOPLACES = Decimal("0.01") # Minsta valutaenhet.
+TWOPLACES = Decimal("0.01")
 
 
 def _to_money(value: Decimal | int | str | float) -> Decimal:
-    
-    # Konverterar säkert till Decimal, Stoppar flyttalsbrus, Säkerställer exakt två decimaler innan DB och affärslogik
+    """
+    Konverterar säkert till Decimal:
+    - stoppar flyttalsbrus (via str)
+    - tvingar 2 decimaler (ROUND_HALF_UP)
+    """
+    d = value if isinstance(value, Decimal) else Decimal(str(value))
+    return d.quantize(TWOPLACES, rounding=ROUND_HALF_UP)
 
-    if isinstance(value, Decimal):
-        d = value
-    else:
-        d = Decimal(str(value))
-    return d.quantize(TWOPLACES, rounding=ROUND_HALF_UP) # Decimal.quantize() används för att tvinga ett Decimal-tal till ett bestämt antal decimaler, med kontrollerad avrundning.
 
+# -----------------------------
+# Pure logic result type (unit-test friendly)
+# -----------------------------
+
+@dataclass(frozen=True)
+class TxResult:
+    NewBalance: Decimal
+
+
+# -----------------------------
+# Service
+# -----------------------------
 
 class TransactionService:
     """
-    Enda stället i koden som ska få uppdatera Account.Balance.
+    Enda stället i koden som ska få uppdatera Account.Balance (för DB-flöden).
     Routes/användare ska aldrig röra Balance direkt.
     """
 
+    # -------- DB helpers --------
+
     @staticmethod
-    def _lock_account(session: Session, account_id: int) -> Account:
+    def _lock_account(session: Session | scoped_session[Session], account_id: int) -> Account:
         """
-        SELECT ... FOR UPDATE för att undvika att två uttag samtidigt
-        kan gå igenom på samma saldo.
+        SELECT ... FOR UPDATE för att undvika race conditions.
+        (Notera: bäst stöd i MySQL/Postgres; SQLite kan bete sig annorlunda.)
         """
         stmt = (
             select(Account)
@@ -68,6 +86,41 @@ class TransactionService:
             raise ValueError(f"Account {account_id} not found")
         return account
 
+    # -------- Pure logic (no DB) --------
+    # Dessa används i unit tests, och kan även återanvändas i DB-metoderna.
+
+    @staticmethod
+    def deposit_logic(account: Account, amount) -> TxResult:
+        amt = _to_money(amount)
+        if amt <= Decimal("0"):
+            raise InvalidAmountError("Amount must be > 0")
+
+        new_balance = _to_money(account.Balance) + amt
+        account.Balance = new_balance
+        return TxResult(NewBalance=new_balance)
+
+    @staticmethod
+    def withdraw_logic(account: Account, amount) -> TxResult:
+        amt = _to_money(amount)
+        if amt <= Decimal("0"):
+            raise InvalidAmountError("Amount must be > 0")
+
+        balance = _to_money(account.Balance)
+        if amt > balance:
+            raise InsufficientFundsError(account.Id, balance, amt)
+
+        new_balance = balance - amt
+        account.Balance = new_balance
+        return TxResult(NewBalance=new_balance)
+
+    @staticmethod
+    def transfer_logic(from_account: Account, to_account: Account, amount) -> tuple[TxResult, TxResult]:
+        w = TransactionService.withdraw_logic(from_account, amount)
+        d = TransactionService.deposit_logic(to_account, amount)
+        return w, d
+
+    # -------- DB methods (integration) --------
+
     @staticmethod
     def deposit(account_id: int, amount, operation: str = "Deposit") -> Transaction:
         amt = _to_money(amount)
@@ -77,19 +130,17 @@ class TransactionService:
         session = db.session
         account = TransactionService._lock_account(session, account_id)
 
-        new_balance = _to_money(account.Balance) + amt
+        # använd samma logik som unit-testas
+        res = TransactionService.deposit_logic(account, amt)
 
         tx = Transaction(
             Type="CREDIT",
             Operation=operation,
             Date=datetime.utcnow(),
             Amount=amt,
-            NewBalance=new_balance,
+            NewBalance=res.NewBalance,
             AccountId=account.Id,
         )
-
-        # Uppdatera saldo endast här, som en bieffekt av transaktionen
-        account.Balance = new_balance
 
         session.add(tx)
         session.commit()
@@ -104,22 +155,17 @@ class TransactionService:
         session = db.session
         account = TransactionService._lock_account(session, account_id)
 
-        current = _to_money(account.Balance)
-        if current < amt:
-            raise InsufficientFundsError(account.Id, current, amt)
-
-        new_balance = current - amt
+        # använd samma logik som unit-testas
+        res = TransactionService.withdraw_logic(account, amt)
 
         tx = Transaction(
             Type="DEBIT",
             Operation=operation,
             Date=datetime.utcnow(),
             Amount=amt,
-            NewBalance=new_balance,
+            NewBalance=res.NewBalance,
             AccountId=account.Id,
         )
-
-        account.Balance = new_balance
 
         session.add(tx)
         session.commit()
@@ -130,49 +176,40 @@ class TransactionService:
         if from_account_id == to_account_id:
             raise ValueError("Cannot transfer to the same account")
 
-        amt = _to_money(amount) # Gör om input till Decimal och valutagrundvärdet 0.01
+        amt = _to_money(amount)
         if amt <= Decimal("0"):
             raise InvalidAmountError("Amount must be > 0")
 
         session = db.session
 
-        # Lås i stabil ordning för att minska deadlocks (lägsta id först) Genom att alltid låsa i samma ordning minskas risken drastiskt.
+        # Lås i stabil ordning för att minska deadlocks
         first_id, second_id = sorted([from_account_id, to_account_id])
-        first = TransactionService._lock_account(session, first_id) # andra transaktioner som vill låsa samma konto måste vänta tills du committar/rollar tillbaka.
+        first = TransactionService._lock_account(session, first_id)
         second = TransactionService._lock_account(session, second_id)
 
-        # Mappa tillbaka till from/to
         from_acc = first if first.Id == from_account_id else second
         to_acc = second if from_acc is first else first
 
-        from_balance = _to_money(from_acc.Balance)
-        if from_balance < amt:
-            raise InsufficientFundsError(from_acc.Id, from_balance, amt)
+        # använd samma logik som unit-testas
+        res_out, res_in = TransactionService.transfer_logic(from_acc, to_acc, amt)
 
-        new_from = from_balance - amt
-        new_to = _to_money(to_acc.Balance) + amt
-
-        # Två transaktioner, samma commit (atomärt)
         tx_out = Transaction(
             Type="DEBIT",
             Operation=f"Transfer to account nr: {to_acc.Id}",
-            Date=datetime.now(),
+            Date=datetime.utcnow(),
             Amount=amt,
-            NewBalance=new_from,
+            NewBalance=res_out.NewBalance,
             AccountId=from_acc.Id,
         )
 
         tx_in = Transaction(
             Type="CREDIT",
             Operation=f"Transfer from account nr: {from_acc.Id}",
-            Date=datetime.now(),
+            Date=datetime.utcnow(),
             Amount=amt,
-            NewBalance=new_to,
+            NewBalance=res_in.NewBalance,
             AccountId=to_acc.Id,
         )
-
-        from_acc.Balance = new_from
-        to_acc.Balance = new_to
 
         session.add_all([tx_out, tx_in])
         session.commit()
