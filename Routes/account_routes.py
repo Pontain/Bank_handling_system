@@ -15,9 +15,14 @@ def get_one(account_id: int):
     if not account:
         abort(404)
 
-    limit = request.args.get("limit", default=50, type=int)
-    offset = request.args.get("offset", default=0, type=int)
-    transactions = AccountService.get_transactions(account_id, limit=limit, offset=offset)
+    page_size = 20
+    offset = 0
+
+
+    transactions = AccountService.get_transactions(account_id, limit=page_size + 1, offset=offset)
+
+    has_more = len(transactions) > page_size
+    transactions = transactions[:page_size]  # trim extra transaction used for has_more check
 
     # Skapa forms och förifyll hidden fields
     deposit_form = AccountDepositForm()
@@ -36,6 +41,7 @@ def get_one(account_id: int):
         deposit_form=deposit_form,
         withdraw_form=withdraw_form,
         transfer_form=transfer_form,
+        has_more=has_more
     )
 
 

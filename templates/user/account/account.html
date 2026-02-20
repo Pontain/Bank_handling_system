@@ -61,34 +61,46 @@
 
   <h2>Transactions</h2>
 
-  {% if transactions %}
-    <table class="stats-table">
-      <thead>
+{% if transactions %}
+  <table class="stats-table">
+    <thead>
+      <tr>
+        <th>Id</th>
+        <th>Date</th>
+        <th>Type</th>
+        <th>Operation</th>
+        <th class="right">Amount</th>
+        <th class="right">NewBalance</th>
+      </tr>
+    </thead>
+    <tbody id="tx-table-body">
+      {% for t in transactions %}
         <tr>
-          <th>Id</th>
-          <th>Date</th>
-          <th>Type</th>
-          <th>Operation</th>
-          <th class="right">Amount</th>
-          <th class="right">NewBalance</th>
+          <td>{{ t.Id }}</td>
+          <td>{{ t.Date }}</td>
+          <td>{{ t.Type }}</td>
+          <td>{{ t.Operation }}</td>
+          <td class="right">{{ "%.2f"|format(t.Amount) }}</td>
+          <td class="right">{{ "%.2f"|format(t.NewBalance) }}</td>
         </tr>
-      </thead>
-      <tbody>
-        {% for t in transactions %}
-          <tr>
-            <td>{{ t.Id }}</td>
-            <td>{{ t.Date }}</td>
-            <td>{{ t.Type }}</td>
-            <td>{{ t.Operation }}</td>
-            <td class="right">{{ "%.2f"|format(t.Amount) }}</td>
-            <td class="right">{{ "%.2f"|format(t.NewBalance) }}</td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  {% else %}
-    <p>No transactions found for this account.</p>
-  {% endif %}
+      {% endfor %}
+    </tbody>
+  </table>
 
-</div>
+  {% if has_more %}
+  <button
+    id="loadMoreBtn"
+    class="btn btn-primary"
+    data-account-id="{{ account.Id }}"
+    data-offset="{{ transactions|length }}"
+    data-limit="20"
+  >
+    Hämta fler transaktioner
+  </button>
+  <p id="loadMoreStatus" class="text-secondary mt-2"></p>
+{% endif %}
+
+{% else %}
+  <p>No transactions found for this account.</p>
+{% endif %}
 {% endblock %}

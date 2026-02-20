@@ -16,7 +16,7 @@ from models.model import Account, Transaction
 # -----------------------------
 
 @dataclass
-class InsufficientFundsError(Exception):
+class InsufficientFundsError(Exception): # Data som innehåller felinformation, och som kan printas snyggt
     account_id: int
     balance: Decimal
     requested: Decimal
@@ -28,7 +28,7 @@ class InsufficientFundsError(Exception):
         )
 
 
-class InvalidAmountError(Exception):
+class InvalidAmountError(Exception): # Felaktigt belopp (negativt eller noll)
     pass
 
 
@@ -39,7 +39,8 @@ class InvalidAmountError(Exception):
 TWOPLACES = Decimal("0.01")
 
 
-def _to_money(value: Decimal | int | str | float) -> Decimal:
+def _to_money(value: Decimal | int | str | float) -> Decimal:   # Alla belopp som passerar funktionen ska få samma formatering, 
+                                                                # oavsett om de kommer in som Decimal, int, str eller float
     """
     Konverterar säkert till Decimal:
     - stoppar flyttalsbrus (via str)
@@ -53,7 +54,7 @@ def _to_money(value: Decimal | int | str | float) -> Decimal:
 # Pure logic result type (unit-test friendly)
 # -----------------------------
 
-@dataclass(frozen=True)
+@dataclass(frozen=True) # Immutable dataklass som används för att returnera resultat från logikfunktionerna, och som är lätt att testa
 class TxResult:
     NewBalance: Decimal
 
@@ -76,7 +77,7 @@ class TransactionService:
         SELECT ... FOR UPDATE för att undvika race conditions.
         (Notera: bäst stöd i MySQL/Postgres; SQLite kan bete sig annorlunda.)
         """
-        stmt = (
+        stmt = ( # “Jag vill hämta kontot och samtidigt låsa raden i databasen tills transaktionen är klar.”
             select(Account)
             .where(Account.Id == account_id)
             .with_for_update()
