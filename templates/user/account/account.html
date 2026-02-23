@@ -24,33 +24,39 @@
 
 <h2>Actions</h2>
 
-<div class="actions-compact">
+<div class="account-actions-compact">
 
-  <div class="actions-row">
+  <div class="actions-row-compact">
 
     <form method="post"
       action="{{ url_for('account.deposit', account_id=account.Id) }}"
-      class="search-form action-form">
+      class="action-form">
   {{ deposit_form.hidden_tag() }}
-  {{ deposit_form.amount() }}
-  {{ deposit_form.submit(class="btn btn-primary") }}
+  <div class="action-inline">
+    {{ deposit_form.submit(class="btn btn-primary") }}
+    {{ deposit_form.amount(placeholder="Amount") }}
+  </div>
 </form>
 
 <form method="post"
       action="{{ url_for('account.withdraw', account_id=account.Id) }}"
-      class="search-form action-form">
+      class="action-form">
   {{ withdraw_form.hidden_tag() }}
-  {{ withdraw_form.amount() }}
-  {{ withdraw_form.submit(class="btn btn-primary") }}
+  <div class="action-inline">
+    {{ withdraw_form.submit(class="btn btn-primary") }}
+    {{ withdraw_form.amount(placeholder="Amount") }}
+  </div>
 </form>
 
 <form method="post"
       action="{{ url_for('account.transfer', account_id=account.Id) }}"
-      class="search-form action-form">
+      class="action-form">
   {{ transfer_form.hidden_tag() }}
-  {{ transfer_form.receiving_account_id() }}
-  {{ transfer_form.amount() }}
-  {{ transfer_form.submit(class="btn btn-primary") }}
+  <div class="action-inline">
+    {{ transfer_form.submit(class="btn btn-primary") }}
+    {{ transfer_form.receiving_account_id(placeholder="To account id") }}
+    {{ transfer_form.amount(placeholder="Amount") }}
+  </div>
 </form>
 
 
