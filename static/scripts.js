@@ -40,9 +40,11 @@ document.addEventListener("DOMContentLoaded", () => {
     ? new Date(tx.date).toLocaleString()
     : "";
 
+  const dateText = tx.date || "";
+
   row.innerHTML = `
     <td>${tx.id}</td>
-    <td>${formattedDate}</td>
+    <td>${dateText}</td>
     <td>${tx.type}</td>
     <td>${tx.operation}</td>
     <td class="right">${parseFloat(tx.amount).toFixed(2)}</td>

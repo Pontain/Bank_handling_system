@@ -11,6 +11,7 @@ from Routes.customer_routes import customer_bp
 from Routes.account_routes import account_bp
 from Routes.admin_routes import admin_bp
 from api.accounts_api import accounts_api
+from api.customers_api import customers_api
 from models.model import Employee, Role
 
 load_dotenv()
@@ -38,6 +39,7 @@ app.register_blueprint(customer_bp)
 app.register_blueprint(account_bp)
 app.register_blueprint(admin_bp)
 app.register_blueprint(accounts_api)
+app.register_blueprint(customers_api)
 
 # Create a user datastore that registers users in our system
 # Connects a user to a role

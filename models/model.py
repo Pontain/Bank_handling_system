@@ -29,7 +29,7 @@ class Customer(TimestampMixin, SoftDeletionMixin, db.Model):
     Zipcode: Mapped[str] = mapped_column(db.String(10), unique=False, nullable=False)
     Country: Mapped[str] = mapped_column(db.String(30), unique=False, nullable=False)
     CountryCode: Mapped[str] = mapped_column(db.String(2), unique=False, nullable=False)
-    Birthday: Mapped[date | None] = mapped_column(db.Date, unique=False, nullable=False)
+    Birthday: Mapped[date] = mapped_column(db.Date, unique=False, nullable=False)
     NationalId: Mapped[str] = mapped_column(db.String(20), unique=False, nullable=False)
     Telephone: Mapped[str] = mapped_column(db.String(20), unique=False, nullable=False)
     EmailAddress: Mapped[str] = mapped_column(db.String(50), unique=False, nullable=False)
@@ -53,7 +53,7 @@ class Account(TimestampMixin, db.Model):
         unique=False,
         nullable=False,
     )
-    Balance = mapped_column(Numeric(18, 2), unique=False, nullable=False)
+    Balance = mapped_column(Numeric(18, 2), unique=False, nullable=False, default=0, server_default="0.00")
     Transactions = db.relationship("Transaction", backref="account", lazy=True)
     CustomerId = mapped_column(
         db.Integer, db.ForeignKey("customers.Id"), nullable=False

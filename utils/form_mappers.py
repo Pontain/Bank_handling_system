@@ -16,7 +16,7 @@ def prefill_customer_form(form: CustomerCreateForm, customer: Customer) -> None:
     form.country_code.data = customer.CountryCode
 
     # DateField expects date, model has datetime
-    form.birthday.data = customer.Birthday.date() if customer.Birthday else None
+    form.birthday.data = customer.Birthday if customer.Birthday else None
 
     form.national_id.data = customer.NationalId
     form.telephone.data = customer.Telephone
