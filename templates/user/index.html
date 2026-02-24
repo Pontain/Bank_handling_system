@@ -1,22 +1,103 @@
 {% extends "user/layout.html" %}
 
-{% block title %}Home Page{% endblock %}
+{% block title %}Home{% endblock %}
 
 {% block content %}
-<section class="hero text-primary">
-    <div class="container">
-        <h1>My Flask Web page</h1>
-        <h2>This will become a nice bank app.</h2>
-        <p>This is the content of the index page!</p>
-        <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Consectetur aut laboriosam quis, vero dicta natus culpa voluptas fuga dolorem, deserunt esse, dolore atque. Ipsa, similique. Commodi ut dolore illo rem.</p>
-        <button class="btn btn-primary">primary button</button>
-        <button class="btn btn-secondary">secondary button</button>
+<section class="home-hero text-primary">
+  <div class="container hero-grid">
+
+    <div class="hero-text">
+      <h1>The gold bank</h1>
+      <h2>The first gold farming bank.</h2>
     </div>
+
+    <div class="hero-logo">
+      <img
+        src="{{ url_for('static', filename='assets/images/logo.jpg') }}"
+        alt="Bank logo"
+      >
+    </div>
+
+  </div>
 </section>
 
-<section class="info">
+<!-- <section class="info"> är ett semantiskt HTML-element för ett eget innehållsblock
+.info ger bakgrundsfärg via CSS (--color-bg-section)
+.container begränsar sidans bredd och centrerar innehållet -->
+
+<section class="info"> 
     <div class="container">
-        <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Dolor, soluta quae maiores quisquam recusandae, ab voluptatibus eligendi assumenda id quas expedita distinctio ex commodi modi facilis, temporibus laudantium nemo natus!</p>
+
+        <h3 class="text-secondary">Statistics</h3> 
+
+        <!-- Sammanfattnings-rutor -->
+
+        <div class="stats-grid"> <!-- CSS Grid för layout av rutorna, visas under varandra på mobil och bredvid varandra på större skärmar -->
+            <div class="stats-card"> <!-- En ruta, kort, med vit bakrund -->
+                <small>Number of customers</small> <!-- mindre text ovanför siffran -->
+                <div class="stats-number">{{ customer_count }}</div>    <!-- jinja syntax för att hämta "Statistics(db.session).dashboard()" -->
+            </div>
+
+            <div class="stats-card">
+                <small>Number of accounts</small>
+                <div class="stats-number">{{ account_count }}</div>
+            </div>
+        </div>
+
+        <!-- Tabell för salto per konto -->
+        
+        <div class="stats-card">
+            <small>Total balance (all accounts)</small>
+            <div class="stats-number">
+                {{ "%.2f"|format(total_balance_all_accounts) }} kr
+            </div>
+        </div>
+
+        <h3 class="text-secondary">Top 10 Account Balances</h3>
+
+        {% if totals_per_account %}
+            <div class="table-wrap">
+                <table class="stats-table">
+                    <thead>
+                        <tr>
+                            <th>Account-ID</th>
+                            <th class="right">Total</th> <!-- class="right" för att högerjustera texten i tabellhuvudet -->
+                        </tr>
+                    </thead> <!-- Tabellen huvud fram tills hit -->
+                    <tbody>
+                        {% for row in totals_per_account %} <!-- Loopar igenom varje rad i listan "totals_per_account" row är en rad från SQLAlchemy queryn -->
+                             <tr>
+                                <td>{{ row.Id }}</td> <!-- Konto-ID -->
+                                <td class="right">{{ "%.2f" | format(row.total) }}</td> <!-- Konto-saldo, högerjusterad med två decimaler -->
+                             </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="text-secondary">No account balances available.</p> <!-- Visas om listan är tom, sk. fallback-text. -->
+        {% endif %}
+
+    <!-- Länkar till Top 10 per land -->
+    {% if countries %}
+    <div class="stats-card">
+        <small>View Top 10 customers by country</small>
+
+        <div style="margin-top: 0.5rem;">
+        {% for country in countries %}
+            <a
+            class="btn btn-secondary"
+            style="margin-right: 0.25rem;"
+            href="{{ url_for('country_details', country_code=country) }}"
+            >
+            {{ country }}
+            </a>
+        {% endfor %}
+        </div>
     </div>
+    {% endif %}
+
+
+        
 </section>
 {% endblock %}

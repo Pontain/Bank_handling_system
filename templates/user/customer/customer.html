@@ -1,0 +1,97 @@
+{% extends "user/layout.html" %}
+
+{% block title %}Customer {{ customer.Id }}{% endblock %}
+
+{% block content %}
+
+<div class="card page-card">
+
+  <a href="{{ url_for('customer.get_all') }}"
+     class="btn btn-primary mb-3">
+    ← Back to customers
+  </a>
+
+  <h1 class="mb-3">{{ customer.GivenName }} {{ customer.Surname }}</h1>
+
+  <div class="customer-info card glass-left info-grid">
+
+    <!-- Actions flyttade in i kortet -->
+    <div class="card-actions">
+      <a href="{{ url_for('customer.edit_customer', id=customer.Id) }}"
+         class="btn btn-primary btn-sm">
+        Edit
+      </a>
+
+      <form method="post"
+            action="{{ url_for('customer.delete_customer', id=customer.Id) }}"
+            onsubmit="return confirm('Delete customer?')">
+        <button class="btn btn-danger btn-sm" type="submit">
+          Delete
+        </button>
+      </form>
+    </div>
+
+    <div class="info-row">
+      <span class="label">Customer ID</span>
+      <span class="value">{{ customer.Id }}</span>
+    </div>
+
+    <div class="info-row">
+      <span class="label">National ID</span>
+      <span class="value">{{ customer.NationalId }}</span>
+    </div>
+
+    <div class="info-row">
+      <span class="label">Address</span>
+      <span class="value">{{ customer.Streetaddress }}, {{ customer.City }}</span>
+    </div>
+
+    <div class="info-row">
+      <span class="label">Email</span>
+      <span class="value">{{ customer.EmailAddress }}</span>
+    </div>
+
+    <div class="info-row">
+      <span class="label">Phone</span>
+      <span class="value">+{{ customer.TelephoneCountryCode }} {{ customer.Telephone }}</span>
+    </div>
+  </div>
+
+  <hr>
+
+  <p class="total-balance">
+    <strong>Total balance:</strong>
+    {{ "%.2f"|format(total_balance) }}
+  </p>
+
+  <h2>Accounts</h2>
+
+  {% if customer.Accounts %}
+    <table class="stats-table">
+      <thead>
+        <tr>
+          <th>Account ID</th>
+          <th>Type</th>
+          <th>Created</th>
+          <th class="right">Balance</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for acc in customer.Accounts %}
+          <tr class="clickable-row"
+              data-href="{{ url_for('account.get_one', account_id=acc.Id) }}">
+            <td>{{ acc.Id }}</td>
+            <td>{{ acc.AccountType.value if acc.AccountType else "—" }}</td>
+            <td>{{ acc.Created }}</td>
+            <td class="right">{{ "%.2f"|format(acc.Balance) }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>No accounts for this customer.</p>
+  {% endif %}
+
+</div>  <!-- stänger page-card -->
+
+{% endblock %}

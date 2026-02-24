@@ -1,0 +1,131 @@
+{% extends "user/layout.html" %}
+
+{% block title %}Staff {{ user.id }}{% endblock %}
+
+{% block content %}
+<div class="container">
+
+  {# Back-knapp likt customer-sidan #}
+  <div class="action-buttons">
+    <a href="{{ url_for('admin.get_all_staff') }}" class="btn btn-primary">
+      ← Back to staff
+    </a>
+  </div>
+
+  <h1 class="text-secondary">{{ user.username }}</h1>
+  <p class="text-secondary">Staff profile</p>
+
+  {# Info-kortet, samma vibe som customer #}
+  <div class="soft-card info-card">
+
+    {# Små actions uppe till höger #}
+    <div class="card-actions">
+
+      {# Activate / Deactivate #}
+      <form method="post" action="{{ url_for('admin.set_active', id=user.id) }}">
+        {% if user.active %}
+          <input type="hidden" name="is_active" value="0">
+          <button type="submit" class="btn btn-danger">Deactivate</button>
+        {% else %}
+          <input type="hidden" name="is_active" value="1">
+          <button type="submit" class="btn btn-primary">Activate</button>
+        {% endif %}
+      </form>
+
+      {% if user.is_deleted %}
+  <form method="post"
+        action="{{ url_for('admin.restore_employee', id=user.id) }}"
+        onsubmit="return confirm('Restore this employee?');">
+    <button type="submit" class="btn btn-primary">
+      Restore
+    </button>
+  </form>
+{% endif %}
+
+
+      {# Delete #}
+       <form method="post" action="{{ url_for('admin.delete_employee', id=user.id) }}"
+            onsubmit="return confirm('Are you sure you want to delete this employee?');">
+        <button type="submit" class="btn btn-danger">Delete</button>
+      </form> 
+
+    </div>
+
+    {# Info-grid som på customer #}
+    <div class="info-grid">
+
+      <div class="info-row">
+        <div class="label">Staff ID</div>
+        <div class="value">{{ user.id }}</div>
+      </div>
+
+      <div class="info-row">
+        <div class="label">Email</div>
+        <div class="value">{{ user.email }}</div>
+      </div>
+
+      <div class="info-row">
+        <div class="label">Status</div>
+        <div class="value">
+          {% if user.is_deleted %}
+            <span class="badge bg-danger">Deleted</span>
+          {% elif user.active %}
+            <span class="badge bg-success">Active</span>
+          {% else %}
+            <span class="badge bg-secondary">Inactive</span>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="info-row">
+        <div class="label">Roles</div>
+        <div class="value">
+          {% if user.roles and user.roles|length > 0 %}
+            {% for r in user.roles %}
+              <span class="badge bg-secondary">{{ r.name }}</span>
+            {% endfor %}
+          {% else %}
+            <span class="text-secondary">No roles assigned</span>
+          {% endif %}
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <hr>
+
+  {# Roller: små knappar/chips, i en kompakt sektion #}
+  <div class="soft-card info-card">
+    <h2 class="text-secondary mb-3">Roles</h2>
+
+    <div class="roles-actions">
+
+      <form method="post" action="{{ url_for('admin.add_role', id=user.id) }}">
+        <input type="hidden" name="role" value="CASHIER">
+        <button type="submit" class="btn btn-primary">+ Cashier</button>
+      </form>
+
+      <form method="post" action="{{ url_for('admin.add_role', id=user.id) }}">
+        <input type="hidden" name="role" value="ADMIN">
+        <button type="submit" class="btn btn-primary">+ Admin</button>
+      </form>
+
+      <form method="post" action="{{ url_for('admin.remove_role', id=user.id) }}">
+        <input type="hidden" name="role" value="CASHIER">
+        <button type="submit" class="btn btn-danger">- Cashier</button>
+      </form>
+
+      <form method="post" action="{{ url_for('admin.remove_role', id=user.id) }}">
+        <input type="hidden" name="role" value="ADMIN">
+        <button type="submit" class="btn btn-danger">- Admin</button>
+      </form>
+
+    </div>
+
+    <p class="text-secondary mt-2" style="margin-bottom:0;">
+    </p>
+  </div>
+
+</div>
+{% endblock %}

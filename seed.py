@@ -1,5 +1,7 @@
-from datetime import datetime, timedelta
+# pyright: reportIncompatibleVariableOverride=false
 import random
+from datetime import datetime, timedelta, date
+from flask_security.utils import hash_password
 from faker import Faker
 from models.model import Customer, Account, AccountType, Transaction
 
@@ -27,12 +29,15 @@ def seedData(db):
         customer.CountryCode = random.choice(countries)
 
         # Birthday & NationalId
-        customer.Birthday = fake.date_of_birth(minimum_age=18, maximum_age=90)
-        cc_number = fake.random_number(digits=4, fix_len=True)
-        customer.NationalId = customer.Birthday.strftime("%Y%m%d-") + str(cc_number)
+        birthday = date.fromisoformat(
+            fake.date_of_birth(minimum_age=18, maximum_age=90).isoformat()
+        )
+
+        customer.Birthday = birthday
+        cc_number: int = fake.random_number(digits=4, fix_len=True)
+        customer.NationalId = birthday.strftime("%Y%m%d-") + str(cc_number)
 
         # Phone & Email
-        customer.TelephoneCountryCode = 55
         customer.Telephone = fake.phone_number()
         customer.EmailAddress = fake.email().lower()
 
@@ -49,7 +54,7 @@ def seedData(db):
                 account.AccountType = AccountType.SAVINGS
 
             start = datetime.now() + timedelta(days=-random.randint(1000, 10000))
-            account.Created = start
+            account.created_at = start
             account.Balance = 0
 
             # Transactions
@@ -97,5 +102,69 @@ def seedData(db):
 
         db.session.add(customer)
         antal += 1
+
+    db.session.commit()
+
+
+def seed_security_staff(db, user_datastore):
+    # Skapa roller
+    for role_name, desc in [
+        ("ADMIN", "Admin handles employees"),
+        ("CASHIER", "Cashier handles accounts and transactions"),
+    ]:
+        user_datastore.find_or_create_role(
+            name=role_name,
+            description=desc,
+        )
+
+    db.session.commit()
+
+    admin_role = user_datastore.find_role("ADMIN")
+    cashier_role = user_datastore.find_role("CASHIER")
+
+    # Admin
+    if not user_datastore.find_user(email="admin@test.se"):
+        user_datastore.create_user(
+            email="admin@test.se",
+            username="Admin",
+            password=hash_password("Hejsan123!"),
+            roles=[admin_role],
+        )
+
+    # Cashier
+    if not user_datastore.find_user(email="cashier@test.se"):
+        user_datastore.create_user(
+            email="cashier@test.se",
+            username="Cashier",
+            password=hash_password("Hejsan123!"),
+            roles=[cashier_role],
+        )
+
+    # Supervisor (båda rollerna)
+    if not user_datastore.find_user(email="supervisor@test.se"):
+        user_datastore.create_user(
+            email="supervisor@test.se",
+            username="Supervisor",
+            password=hash_password("Hejsan123!"),
+            roles=[admin_role, cashier_role],
+        )
+
+    # Kimmo-Admin
+    if not user_datastore.find_user(email="kimmo.ahola@systementor.se"):
+        user_datastore.create_user(
+            email="kimmo.ahola@systementor.se",
+            username="Kimmo-Admin",
+            password=hash_password("Hejsan123!"),
+            roles=[admin_role],
+        )
+
+    # Kimmo-Cashier
+    if not user_datastore.find_user(email="kimmo.ahola@webbramverk.se"):
+        user_datastore.create_user(
+            email="kimmo.ahola@webbramverk.se",
+            username="Kimmo-Cashier",
+            password=hash_password("Hejsan123!"),
+            roles=[cashier_role],
+        )
 
     db.session.commit()

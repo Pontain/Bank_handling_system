@@ -1,0 +1,112 @@
+{% extends "user/layout.html" %}
+
+{% block title %}Account {{ account.Id }}{% endblock %}
+
+{% block content %}
+<div class="card page-card">
+
+  <a href="{{ url_for('customer.get_one', id=account.CustomerId) }}"
+     class="btn btn-primary mb-3">
+    ← Back to customer
+  </a>
+
+  <h1 class="text-secondary">Account {{ account.Id }}</h1>
+
+  <div class="card info-card">
+    <p><strong>Type:</strong> {{ account.AccountType.value if account.AccountType else account.AccountType }}</p>
+    <p><strong>Created:</strong> {{ account.created_at }}</p>
+    <p><strong>Balance:</strong> {{ account.Balance }}</p>
+  </div>
+
+</div>
+
+  <hr>
+
+<h2>Actions</h2>
+
+<div class="account-actions-compact">
+
+  <div class="actions-row-compact">
+
+    <form method="post"
+      action="{{ url_for('account.deposit', account_id=account.Id) }}"
+      class="action-form">
+  {{ deposit_form.hidden_tag() }}
+  <div class="action-inline">
+    {{ deposit_form.submit(class="btn btn-primary") }}
+    {{ deposit_form.amount(placeholder="Amount") }}
+  </div>
+</form>
+
+<form method="post"
+      action="{{ url_for('account.withdraw', account_id=account.Id) }}"
+      class="action-form">
+  {{ withdraw_form.hidden_tag() }}
+  <div class="action-inline">
+    {{ withdraw_form.submit(class="btn btn-primary") }}
+    {{ withdraw_form.amount(placeholder="Amount") }}
+  </div>
+</form>
+
+<form method="post"
+      action="{{ url_for('account.transfer', account_id=account.Id) }}"
+      class="action-form">
+  {{ transfer_form.hidden_tag() }}
+  <div class="action-inline">
+    {{ transfer_form.submit(class="btn btn-primary") }}
+    {{ transfer_form.receiving_account_id(placeholder="To account id") }}
+    {{ transfer_form.amount(placeholder="Amount") }}
+  </div>
+</form>
+
+
+</div>
+
+
+
+
+  <h2>Transactions</h2>
+
+{% if transactions %}
+  <table class="stats-table">
+    <thead>
+      <tr>
+        <th>Id</th>
+        <th>Date</th>
+        <th>Type</th>
+        <th>Operation</th>
+        <th class="right">Amount</th>
+        <th class="right">NewBalance</th>
+      </tr>
+    </thead>
+    <tbody id="tx-table-body">
+      {% for t in transactions %}
+        <tr>
+          <td>{{ t.Id }}</td>
+          <td>{{ t.Date }}</td>
+          <td>{{ t.Type }}</td>
+          <td>{{ t.Operation }}</td>
+          <td class="right">{{ "%.2f"|format(t.Amount) }}</td>
+          <td class="right">{{ "%.2f"|format(t.NewBalance) }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  {% if has_more %}
+  <button
+    id="loadMoreBtn"
+    class="btn btn-primary"
+    data-account-id="{{ account.Id }}"
+    data-offset="{{ transactions|length }}"
+    data-limit="20"
+  >
+    Hämta fler transaktioner
+  </button>
+  <p id="loadMoreStatus" class="text-secondary mt-2"></p>
+{% endif %}
+
+{% else %}
+  <p>No transactions found for this account.</p>
+{% endif %}
+{% endblock %}
