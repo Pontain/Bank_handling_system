@@ -1,7 +1,6 @@
 from flask import Blueprint, render_template, abort, request, redirect, url_for, flash
 from services.customer_service import CustomerService
 from flask_security.decorators import auth_required, roles_required
-from decimal import Decimal
 from typing import cast
 from database import db
 from models.model import Account, Customer
@@ -99,7 +98,6 @@ def create_customer():
     return render_template("user/customer/create_customer.html", form=form)
 
 
-
 @customer_bp.route("/<int:id>/edit", methods=["GET", "POST"])
 @auth_required()
 @roles_required("CASHIER")
@@ -122,8 +120,6 @@ def edit_customer(id: int):
 
     if request.method == "POST" and not form.validate_on_submit():
         flash(f"Form errors: {form.errors}", "danger")
-
-
 
     return render_template(
         "user/customer/edit_customer.html",

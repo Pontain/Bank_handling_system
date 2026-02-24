@@ -1,12 +1,10 @@
-
 # pyright: reportIncompatibleVariableOverride=false
 import uuid
 from datetime import date
 from enum import Enum as PyEnum
 from flask_sqlalchemy.table import _Table
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import Integer, UniqueConstraint, text, Numeric
-from decimal import Decimal
+from sqlalchemy import Integer, text, Numeric
 from typing import Annotated
 from database import db
 from models.mixin import SoftDeletionMixin, TimestampMixin

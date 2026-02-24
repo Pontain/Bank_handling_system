@@ -11,15 +11,6 @@ from flask_security.utils import hash_password
 
 
 class StaffService:
-    """
-    Service för personal (employees) baserat på Flask-Security modeller.
-
-    Admin kan:
-      - lista personal (paginering/sök/sort)
-      - skapa personal (med hashat lösenord)
-      - aktivera/inaktivera (active)
-      - sätta / ta bort roller (many-to-many via roles)
-    """
 
     SORT_COLUMNS: dict[str, Any] = {
         "id": Employee.id,
@@ -28,9 +19,8 @@ class StaffService:
         "active": Employee.active,
     }
 
-    # ----------------------------
+
     # CREATE
-    # ----------------------------
     @staticmethod
     def create_user(
         email: str,
@@ -39,10 +29,7 @@ class StaffService:
         role_names: list[str] | None = None,
         active: bool = True,
     ) -> Employee:
-        """
-        Skapar en Employee med hashat lösenord och valfria roller.
-        role_names är t.ex. ["ADMIN", "CASHIER"].
-        """
+
         try:
             user = Employee(
                 email=email.lower().strip(),
@@ -62,9 +49,8 @@ class StaffService:
             db.session.rollback()
             raise
 
-    # ----------------------------
+
     # READ
-    # ----------------------------
     @staticmethod
     def get_by_id(employee_id: int) -> Employee | None:
         stmt = (
@@ -94,9 +80,7 @@ class StaffService:
 
     @staticmethod
     def get_roles_by_names(role_names: list[str]) -> list[Role]:
-        """
-        Hämtar Role-objekt för givna rollnamn. Ignorerar namn som inte finns.
-        """
+
         clean = [r.strip().upper() for r in role_names if r and r.strip()]
         if not clean:
             return []
@@ -113,11 +97,7 @@ class StaffService:
         q: str = "",
         include_inactive: bool = False,
     ):
-        """
-        Hämtar personal paginerat.
-        - q söker i email/username
-        - include_inactive: om False visar vi bara active=True
-        """
+
         sort_col = StaffService.SORT_COLUMNS.get(sort_by, Employee.id)
 
         stmt = (
@@ -142,9 +122,8 @@ class StaffService:
 
         return db.paginate(stmt, page=page, per_page=per_page, error_out=False)
 
-    # ----------------------------
+
     # UPDATE
-    # ----------------------------
     @staticmethod
     def set_active(employee_id: int, is_active: bool) -> None:
         try:

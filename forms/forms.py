@@ -8,7 +8,7 @@ from wtforms import (
     StringField,
     SubmitField,
 )
-from wtforms.validators import DataRequired, Optional, Length, Regexp, NumberRange, ValidationError
+from wtforms.validators import DataRequired, Length, Regexp, NumberRange, ValidationError
 from dateutil import relativedelta
 
 
@@ -29,7 +29,7 @@ def is_adult():
 
 
 class AccountDepositForm(FlaskForm):
-    receiving_account_id = HiddenField(validators=[DataRequired()]) # Så du inte kan posta formuläret utan konto-id. Annars kan någon få None och du får konstiga fel
+    receiving_account_id = HiddenField(validators=[DataRequired()]) # Så du inte kan posta formuläret utan konto-id. Annars kan någon få None och det blir konstiga fel
     amount = DecimalField(
         "Amount",
         places=2, # Det gör att fältet hanterar 2 decimaler snyggt vid rendering och parsing.
@@ -139,7 +139,6 @@ class CustomerCreateForm(FlaskForm):
     )
 
     # --- Contact ---
-
     telephone = StringField(
         "Telephone number",
         validators=[

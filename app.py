@@ -1,8 +1,10 @@
 import os
+from dotenv import load_dotenv
+load_dotenv()
+
 from flask import Flask, render_template
 from flask_migrate import Migrate
 from database import db
-from dotenv import load_dotenv
 from flask_security.core import Security
 from flask_security.datastore import SQLAlchemyUserDatastore
 from seed import seedData, seed_security_staff
@@ -14,7 +16,6 @@ from api.accounts_api import accounts_api
 from api.customers_api import customers_api
 from models.model import Employee, Role
 
-load_dotenv()
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL")

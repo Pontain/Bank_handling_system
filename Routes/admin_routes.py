@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, abort,
 from flask_security.decorators import auth_required, roles_required
 from flask_login import current_user
 from services.staff_service import StaffService
-from models.model import Role, Employee
+from models.model import Role
 from database import db
 from sqlalchemy import select
 
@@ -18,14 +18,14 @@ def get_all_staff():
     page = request.args.get("page", default=1, type=int)
     per_page = request.args.get("per_page", default=10, type=int)
 
-    # Sorting (matchar StaffService.SORT_COLUMNS keys)
+    # Sorting
     sort_by = request.args.get("sort_by", default="id", type=str)
     sort_order = request.args.get("sort_order", default="asc", type=str)
 
     # Search
     q = request.args.get("q", default="", type=str)
 
-    # Visa inaktiva?
+    # Visa inaktiva eller inte
     include_inactive = request.args.get("include_inactive") in ("1", "true", "on")
 
     pagination = StaffService.get_paginated(
@@ -37,7 +37,7 @@ def get_all_staff():
         include_inactive=include_inactive,
     )
 
-    # Lista alla roller (för dropdowns/checkboxar i UI om du vill)
+    # Lista alla roller
     roles = db.session.execute(select(Role).order_by(Role.name.asc())).scalars().all()
 
     return render_template(
@@ -93,14 +93,14 @@ def create_staff():
         username = request.form.get("username", "").strip()
         password = request.form.get("password", "").strip()
 
-        # checkboxar med role names, t.ex. ADMIN / CASHIER
+        # checkboxar med role names
         role_names = [r.strip().upper() for r in request.form.getlist("roles") if r.strip()]
 
         if not email or not username or not password:
             flash("Email, username and password are required", "danger")
             return redirect(url_for("admin.create_staff"))
 
-        # (valfritt) enkel guard så man inte råkar skapa dubletter
+        # enkel guard så man inte råkar skapa dubletter
         if StaffService.get_by_email(email):
             flash("Email already exists", "danger")
             return redirect(url_for("admin.create_staff"))

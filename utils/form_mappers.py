@@ -24,7 +24,6 @@ def prefill_customer_form(form: CustomerCreateForm, customer: Customer) -> None:
 
 
 def apply_customer_form(customer: Customer, form: CustomerCreateForm) -> None:
-    """Copy WTForm data into Customer model."""
 
     customer.GivenName = form.given_name.data
     customer.Surname = form.surname.data

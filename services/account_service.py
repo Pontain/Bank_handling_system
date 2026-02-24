@@ -1,10 +1,9 @@
-from typing import Tuple
 from database import db
 from models.model import Account, Transaction
-from sqlalchemy import Select, select
+from sqlalchemy import select
+
 
 class AccountService:
-
 
     @staticmethod
     def get_by_id(account_id: int) -> Account | None:

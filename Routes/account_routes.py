@@ -18,7 +18,6 @@ def get_one(account_id: int):
     page_size = 20
     offset = 0
 
-
     transactions = AccountService.get_transactions(account_id, limit=page_size + 1, offset=offset)
 
     has_more = len(transactions) > page_size

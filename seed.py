@@ -1,11 +1,9 @@
 # pyright: reportIncompatibleVariableOverride=false
-from datetime import datetime, timedelta, date
 import random
-from faker import Faker
-from models.model import Customer, Account, AccountType, Transaction, Employee, Role
-from sqlalchemy import select
-from database import db
+from datetime import datetime, timedelta, date
 from flask_security.utils import hash_password
+from faker import Faker
+from models.model import Customer, Account, AccountType, Transaction
 
 
 def seedData(db):
@@ -13,7 +11,7 @@ def seedData(db):
     antal = db.session.query(Customer).count()
     countries = ["SV", "DK", "NO", "FI"]
 
-    while antal < 1000:
+    while antal < 5000:
         customer = Customer()
         country = random.choice(countries)
         locale = locales[country]
@@ -31,7 +29,6 @@ def seedData(db):
         customer.CountryCode = random.choice(countries)
 
         # Birthday & NationalId
-
         birthday = date.fromisoformat(
             fake.date_of_birth(minimum_age=18, maximum_age=90).isoformat()
         )
@@ -107,7 +104,6 @@ def seedData(db):
         antal += 1
 
     db.session.commit()
-
 
 
 def seed_security_staff(db, user_datastore):

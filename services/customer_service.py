@@ -40,7 +40,6 @@ class CustomerService:
     @staticmethod
     def get_paginated(page: int, per_page: int, sort_by: str, sort_order: str, q: str = "", city: str = ""):
        
-
         sort_col = CustomerService.SORT_COLUMNS.get(sort_by, Customer.Id) # Om sort_by är något okänt → fallback till Customer.Id
 
         stmt = select(Customer).where(Customer.is_deleted.is_(False)) # SELECT * FROM customer

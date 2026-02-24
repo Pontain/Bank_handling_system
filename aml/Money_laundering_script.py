@@ -9,7 +9,6 @@ from typing import Optional
 from flask_mail import Mail, Message
 
 from sqlalchemy import and_, or_
-from sqlalchemy.orm import joinedload
 
 from app import app
 from database import db
@@ -19,9 +18,9 @@ STATE_FILE = "ml_state.json"
 REPORT_TO = "MoneyLaundering@kimmoahola.net"
 REPORT_TO_MYSELF = "pontus.orstadius@gmail.com"
 
-SINGLE_TX_THRESHOLD = 15000
+SINGLE_TX_THRESHOLD = 1500
 WINDOW_HOURS = 72
-WINDOW_THRESHOLD = 23000
+WINDOW_THRESHOLD = 2300
 
 @dataclass(frozen=True) # Skapar en rad i slutrapporten med flaggat konto.
 class FlagRow:
@@ -46,18 +45,18 @@ class JsonStateStore:   # Skapar en json-fil som håller reda på var vi slutate
             return json.load(f)
         
     def save(self, state: dict[str, dict[str, str]]) -> None:
-            with open(self.path, "w", encoding="utf-8") as f:
-                json.dump(state, f, ensure_ascii=False, indent=1)
+        with open(self.path, "w", encoding="utf-8") as f:
+            json.dump(state, f, ensure_ascii=False, indent=1)
 
     def get_cursor(self, state: dict, country: str) -> tuple[Optional[datetime], Optional[int]]:
          
-         c = state.get(country)
-         if not c:
+        c = state.get(country)
+        if not c:
             return None, None
          
-         last_date = datetime.fromisoformat(c["last_date"])
-         last_tx_id = int(c["last_tx_id"])
-         return last_date, last_tx_id
+        last_date = datetime.fromisoformat(c["last_date"])
+        last_tx_id = int(c["last_tx_id"])
+        return last_date, last_tx_id
     
         # Cursor är last_date och last_transaction (tx) id. Så pekar på var sista kollen skedde.
         # None returneras om landet ej körs
@@ -105,7 +104,7 @@ def rule_72h_total(transactions: list[Transaction]) -> dict[int, str]:
 # Report / mail functions
 
 def build_report_text(country: str, rows: list[FlagRow]) -> str:    # Bygger ren text som mail-body. Kravet: lista över personer + kontonummer + transaktionsnummer.
-                                                                    # (Vi lägger även reason så det går att förstå varför den hamnade där.)
+                                                                    # (Lägger även reason så det går att förstå varför den hamnade där.)
     header = [
         f"Money laundering report for {country}",
         f"Generated: {datetime.now().isoformat(timespec='seconds')}",
@@ -157,7 +156,7 @@ class AmlAnalyzer: # Den här klassen håller ihop hela flödet: laddar state, l
     def send_country_email(self, country: str, report_text: str) -> None:
 
         subject = f"[AML] Suspicious transactions report - {country}"
-        msg = Message(subject=subject, recipients=[REPORT_TO], body=report_text)
+        msg = Message(subject=subject, recipients=[REPORT_TO_MYSELF], body=report_text)
         self.mail.send(msg)
 
     def fetch_new_transactions(
